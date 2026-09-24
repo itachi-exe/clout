@@ -478,6 +478,100 @@
     document.body.style.overflow = "";
   }
 
+  // ── Trade sheet ────────────────────────────────────────────────────────────
+  const postTradeSheet    = document.getElementById("tradeSheet");
+  const postTradeSheetClose = document.getElementById("tradeSheetClose");
+  let   tradePost     = null;
+
+  function fmtUsdc(wei) {
+    try {
+      const n = Number(BigInt(wei)) / 1e18;
+      return n < 0.001 ? "<$0.001" : "$" + n.toFixed(n < 0.1 ? 4 : 3);
+    } catch { return "—"; }
+  }
+
+  async function openTradeSheet(p) {
+    if (!postTradeSheet) return;
+    tradePost = p;
+    document.getElementById("tradeSheetTitle").textContent = "Trade — post by @" + (p.handle || p.author.slice(0,6));
+    document.getElementById("tradeSupply").textContent = "—";
+    document.getElementById("tradeBuyPrice").textContent = "—";
+    document.getElementById("tradeHeld").textContent = "—";
+    document.getElementById("tradeStatus").textContent = "";
+    postTradeSheet.classList.add("open");
+    document.body.style.overflow = "hidden";
+    try {
+      const r = await fetch(API + "/api/posts/" + p.id + "/shares" + (account ? "?holder=" + account : ""));
+      const d = await r.json();
+      document.getElementById("tradeSupply").textContent = d.supply;
+      document.getElementById("tradeBuyPrice").textContent = fmtUsdc(d.lastPrice);
+      document.getElementById("tradeHeld").textContent = d.heldByViewer || 0;
+      document.getElementById("tradeSellBtn").disabled = !d.heldByViewer;
+    } catch(e) {
+      document.getElementById("tradeStatus").textContent = "Could not load market data";
+    }
+  }
+
+  function closePostTradeSheet() {
+    postTradeSheet && postTradeSheet.classList.remove("open");
+    document.body.style.overflow = "";
+    tradePost = null;
+  }
+
+  postTradeSheetClose && postTradeSheetClose.addEventListener("click", closePostTradeSheet);
+  postTradeSheet && postTradeSheet.addEventListener("click", e => { if (e.target === postTradeSheet) closePostTradeSheet(); });
+
+  async function execTrade(isBuy) {
+    if (!tradePost || !sessionToken) {
+      showToast("Connect your wallet to trade", { kind:"wallet" }); return;
+    }
+    const status = document.getElementById("tradeStatus");
+    status.textContent = isBuy ? "Preparing buy…" : "Preparing sell…";
+    const buyBtn  = document.getElementById("tradeBuyBtn");
+    const sellBtn = document.getElementById("tradeSellBtn");
+    buyBtn.disabled = true; sellBtn.disabled = true;
+    try {
+      const mkt = await fetch(API + "/api/posts/" + tradePost.id + "/shares" + (account ? "?holder=" + account : "")).then(r => r.json());
+      const SHARES_ADDR = "0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B";
+      const ABI = isBuy
+        ? ["function buyShares(uint256 postId, uint256 amount) payable"]
+        : ["function sellShares(uint256 postId, uint256 amount)"];
+      if (!window.ethereum) { status.textContent = "No wallet detected"; return; }
+      const { ethers } = await import("https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm");
+      const provider   = new ethers.BrowserProvider(window.ethereum);
+      const signer     = await provider.getSigner();
+      const contract   = new ethers.Contract(SHARES_ADDR, ABI, signer);
+      let tx;
+      if (isBuy) {
+        const price    = BigInt(mkt.lastPrice || "0");
+        const floor    = BigInt("100000000000000000");
+        const base     = price > floor ? price : floor;
+        const withFees = base + base / 10n;
+        tx = await contract.buyShares(tradePost.id, 1, { value: withFees });
+      } else {
+        tx = await contract.sellShares(tradePost.id, 1);
+      }
+      status.textContent = "Confirming…";
+      await tx.wait();
+      status.textContent = isBuy ? "Bought!" : "Sold!";
+      const updated = await fetch(API + "/api/posts/" + tradePost.id + "/shares" + (account ? "?holder=" + account : "")).then(r => r.json());
+      document.getElementById("tradeSupply").textContent = updated.supply;
+      document.getElementById("tradeBuyPrice").textContent = fmtUsdc(updated.lastPrice);
+      document.getElementById("tradeHeld").textContent = updated.heldByViewer || 0;
+      document.getElementById("tradeSellBtn").disabled = !updated.heldByViewer;
+      setTimeout(() => { status.textContent = ""; }, 2000);
+    } catch(e) {
+      status.textContent = e.reason || e.message?.slice(0,80) || "Transaction failed";
+    } finally {
+      buyBtn.disabled = false;
+      sellBtn.disabled = false;
+    }
+  }
+
+  document.getElementById("tradeBuyBtn")  && document.getElementById("tradeBuyBtn").addEventListener("click",  () => execTrade(true));
+  document.getElementById("tradeSellBtn") && document.getElementById("tradeSellBtn").addEventListener("click", () => execTrade(false));
+  // ──────────────────────────────────────────────────────────────────────────
+
   function openComposer() {
     const homeItem = document.querySelector(".nav-item");
     if (homeItem) homeItem.click();
@@ -956,9 +1050,11 @@
   const postCtx = {
     api: API,
     token: () => sessionToken,
+    get account() { return account; },
     onAuthNeeded: () => { showToast("Connect your wallet to join in", { kind:"wallet" }); },
     toast: msg => showToast(msg),
     showReason: true,
+    onTrade: (p) => openTradeSheet(p),
   };
   async function loadFeed(scope){
     if (!posts) return;

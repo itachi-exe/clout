@@ -1,12 +1,21 @@
 {
-  "contract": "ArcYard",
   "network": "Arc Testnet",
   "chainId": 5042002,
-  "address": "0xE6295feB75B7ca98389654B610Af772684F7ea3b",
-  "treasury": "0xdCe55D57F96090ade201C13f07bE8a8a0a078da0",
   "deployer": "0x33DfbAF10Dba3655a46d655a14CF6F5A86Cd2e24",
-  "transactionHash": "0x57295747f9971eba55115021c22a1f6ac90291425d29b8075e3a0388eeff6a35",
-  "blockNumber": 63520336,
-  "explorer": "https://explorer.testnet.arc.io/address/0xE6295feB75B7ca98389654B610Af772684F7ea3b",
-  "deployedAt": "2026-09-23T02:29:52.573Z"
+  "treasury": "0x33DfbAF10Dba3655a46d655a14CF6F5A86Cd2e24",
+  "deployedAt": "2026-09-24T13:23:43.855Z",
+  "contracts": {
+    "Clout": {
+      "address": "0x8161ceDA8f9c870FF66271Fd50Fb63CdAEbCAb73",
+      "transactionHash": "0x10f785f96a972466b17e04b1b72ae4c2d302789a3672fd515b8d2f9e8da73619",
+      "blockNumber": 63770485,
+      "explorer": "https://explorer.testnet.arc.io/address/0x8161ceDA8f9c870FF66271Fd50Fb63CdAEbCAb73"
+    },
+    "CloutPostShares": {
+      "address": "0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B",
+      "transactionHash": "0x09b0c097a38613cd39fc8dce55bfbd9e4d1042bd7a755a6e226adeb97ac549e5",
+      "blockNumber": 63770489,
+      "explorer": "https://explorer.testnet.arc.io/address/0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B"
+    }
+  }
 }

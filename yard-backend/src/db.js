@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS posts (
   status TEXT DEFAULT 'pending',  -- pending | confirmed | failed
   like_count INTEGER DEFAULT 0,
   repost_count INTEGER DEFAULT 0,
-  tips_received TEXT DEFAULT '0',
+  tips_received TEXT DEFAULT '0',  -- kept for migration safety, no longer updated
   created_at INTEGER DEFAULT (unixepoch()),
   FOREIGN KEY(author) REFERENCES users(address)
 );
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS author_affinities (
 CREATE TABLE IF NOT EXISTS notifications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   recipient TEXT NOT NULL,
-  kind TEXT NOT NULL,             -- like | repost | tip | follow | mention
+  kind TEXT NOT NULL,             -- like | repost | share_buy | share_sell | follow | mention
   actor TEXT,
   post_id INTEGER,
   amount TEXT,
@@ -153,6 +153,38 @@ CREATE TABLE IF NOT EXISTS key_trades (
 );
 CREATE INDEX IF NOT EXISTS idx_key_trades_created ON key_trades(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_key_holdings_holder ON key_holdings(holder);
+
+-- Post share markets (CloutPostShares contract)
+CREATE TABLE IF NOT EXISTS post_shares (
+  post_id INTEGER PRIMARY KEY,   -- matches posts.id (db id, not chain_post_id)
+  chain_post_id INTEGER,         -- chain post id for contract lookups
+  supply INTEGER NOT NULL DEFAULT 0,
+  last_price TEXT NOT NULL DEFAULT '0',  -- raw curve price for 1 share in wei
+  updated_at INTEGER DEFAULT (unixepoch())
+);
+
+CREATE TABLE IF NOT EXISTS post_share_holdings (
+  post_id INTEGER NOT NULL,
+  holder TEXT NOT NULL,
+  balance INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (post_id, holder)
+);
+
+CREATE TABLE IF NOT EXISTS post_share_trades (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  trader TEXT NOT NULL,
+  post_id INTEGER NOT NULL,
+  author TEXT NOT NULL,
+  is_buy INTEGER NOT NULL,
+  share_amount INTEGER NOT NULL,
+  usdc_amount TEXT NOT NULL,     -- raw curve price (before fees) in wei
+  supply_after INTEGER NOT NULL,
+  tx_hash TEXT,
+  created_at INTEGER DEFAULT (unixepoch())
+);
+CREATE INDEX IF NOT EXISTS idx_post_share_trades_post ON post_share_trades(post_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_share_trades_trader ON post_share_trades(trader, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_share_holdings_holder ON post_share_holdings(holder);
 
 CREATE TABLE IF NOT EXISTS link_previews (
   url TEXT PRIMARY KEY,

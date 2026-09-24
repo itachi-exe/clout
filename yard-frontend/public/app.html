@@ -864,6 +864,11 @@
   .compose-sheet .composer-bottom{padding-left:50px;margin-top:12px}
   .compose-sheet .btn-post{padding:9px 22px;font-size:14px}
 
+  /* trade sheet rows */
+  .trade-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .trade-lbl{font-size:13px;color:var(--muted)}
+  .trade-val{font-size:14px;font-weight:600;color:var(--ink);font-family:var(--mono)}
+
   /* wallet picker sheet: phone browsers have no injected wallet */
   .wallet-sheet{position:fixed;inset:0;z-index:320;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6)}
   .wallet-sheet.open{display:flex;animation:profileIn .2s var(--ease)}
@@ -1247,6 +1252,32 @@
     <button class="ws-cancel" id="tradeSend" type="button" style="background:var(--text-hi);color:var(--navy-0);margin-bottom:8px">Buy keys</button>
     <button class="ws-cancel" type="button" data-close>Cancel</button>
   </section>
+</div>
+
+<div class="compose-sheet" id="tradeSheet">
+  <div class="compose-panel">
+    <div class="compose-grab"></div>
+    <div class="compose-head">
+      <span id="tradeSheetTitle">Trade shares</span>
+      <button id="tradeSheetClose" aria-label="Close">×</button>
+    </div>
+    <div id="tradeSheetBody" style="padding:4px 0 8px">
+      <div class="trade-row">
+        <span class="trade-lbl">Supply</span><span class="trade-val" id="tradeSupply">—</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-lbl">Buy price</span><span class="trade-val" id="tradeBuyPrice">—</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-lbl">You hold</span><span class="trade-val" id="tradeHeld">—</span>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="btn-post" id="tradeBuyBtn" type="button" style="flex:1">Buy 1 share</button>
+        <button class="btn-post" id="tradeSellBtn" type="button" style="flex:1;background:var(--fill-2);color:var(--ink)">Sell 1 share</button>
+      </div>
+      <p id="tradeStatus" style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center;min-height:16px"></p>
+    </div>
+  </div>
 </div>
 
 <div class="compose-sheet" id="composeSheet">

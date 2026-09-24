@@ -25,7 +25,8 @@
     alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg>',
     check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
     close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
-    person:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>'
+    person:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>',
+    trade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 4-8 4 6 3-4 4 6"/><circle cx="19" cy="7" r="3" fill="currentColor" stroke="none" opacity=".3"/><path d="M17 7h4M19 5v4"/></svg>'
   };
 
   function esc(s){
@@ -142,6 +143,10 @@
           '<button class="ay-act reply" type="button" aria-label="Reply">' + ICON.reply + "<span>" + (p.comment_count || 0) + "</span></button>" +
           '<button class="ay-act repost' + (p.viewer_reposted ? " on" : "") + '" type="button" aria-label="Repost" aria-pressed="' + !!p.viewer_reposted + '">' + ICON.repost + "<span>" + (p.repost_count || 0) + "</span></button>" +
           '<button class="ay-act like' + (p.viewer_liked ? " on" : "") + '" type="button" aria-label="Like" aria-pressed="' + !!p.viewer_liked + '">' + ICON.like + "<span>" + (p.like_count || 0) + "</span></button>" +
+          '<button class="ay-act trade" type="button" aria-label="Trade shares" data-post-id="' + p.id + '">' +
+            ICON.trade +
+            '<span class="ay-trade-label">Buy</span>' +
+          '</button>' +
           '<button class="ay-act share" type="button" aria-label="Copy link">' + ICON.share + "</button>" +
         "</div>" +
       "</div>";
@@ -163,6 +168,23 @@
       try { await navigator.clipboard.writeText(link); ctx.toast && ctx.toast("Link copied"); }
       catch(e){ ctx.toast && ctx.toast("Could not copy link"); }
     });
+
+    const tradeBtn = el.querySelector(".ay-act.trade");
+    if (tradeBtn) {
+      tradeBtn.addEventListener("click", () => {
+        if (ctx.onTrade) ctx.onTrade(p);
+      });
+      // fetch market data and update label asynchronously
+      if (ctx.api) {
+        fetch(ctx.api + "/api/posts/" + p.id + "/shares" + (ctx.account ? "?holder=" + ctx.account : ""))
+          .then(r => r.json()).then(d => {
+            const held = d.heldByViewer || 0;
+            const label = tradeBtn.querySelector(".ay-trade-label");
+            if (label) label.textContent = held > 0 ? held + " share" + (held !== 1 ? "s" : "") : "Buy";
+            if (held > 0) tradeBtn.classList.add("on");
+          }).catch(() => {});
+      }
+    }
 
     const like = el.querySelector(".ay-act.like");
     like.addEventListener("click", async () => {

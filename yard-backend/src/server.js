@@ -141,6 +141,56 @@ app.put("/api/profile", writeRateLimit, requireAuth, saveProfile);
 app.post("/api/profile/handle", writeRateLimit, requireAuth, saveProfile);
 
 // ---------------------------------------------------------------- creator keys
+// ── Post share markets ──────────────────────────────────────────────────────
+
+// GET /api/posts/:id/shares?holder=0x...
+app.get("/api/posts/:id/shares", (req, res) => {
+  const postId = parseInt(req.params.id);
+  if (!postId) return res.status(400).json({ error: "invalid post id" });
+  const market = db.prepare("SELECT * FROM post_shares WHERE post_id = ?").get(postId);
+  const holder = String(req.query.holder || "").toLowerCase();
+  let heldByViewer = 0;
+  if (holder && ethers.isAddress(holder)) {
+    const h = db.prepare("SELECT balance FROM post_share_holdings WHERE post_id = ? AND holder = ?").get(postId, holder);
+    heldByViewer = h ? h.balance : 0;
+  }
+  res.json({
+    postId,
+    supply: market ? market.supply : 0,
+    lastPrice: market ? market.last_price : "0",
+    heldByViewer
+  });
+});
+
+// GET /api/posts/:id/shares/trades
+app.get("/api/posts/:id/shares/trades", (req, res) => {
+  const postId = parseInt(req.params.id);
+  if (!postId) return res.status(400).json({ error: "invalid post id" });
+  const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+  const rows = db.prepare(
+    `SELECT t.*, u.handle AS trader_handle
+     FROM post_share_trades t
+     LEFT JOIN users u ON u.address = t.trader
+     WHERE t.post_id = ? ORDER BY t.created_at DESC LIMIT ?`
+  ).all(postId, limit);
+  res.json({ trades: rows });
+});
+
+// GET /api/share-activity — global recent trades feed
+app.get("/api/share-activity", (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+  const rows = db.prepare(
+    `SELECT t.*, u.handle AS trader_handle, p.content AS post_excerpt
+     FROM post_share_trades t
+     LEFT JOIN users u ON u.address = t.trader
+     LEFT JOIN posts p ON p.id = t.post_id
+     ORDER BY t.created_at DESC LIMIT ?`
+  ).all(limit);
+  res.json({ trades: rows });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.get("/api/keys/:creator", (req, res) => {
   const creator = req.params.creator.toLowerCase();
   if (!ethers.isAddress(creator)) return res.status(400).json({ error: "invalid address" });
