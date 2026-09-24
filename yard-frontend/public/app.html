@@ -1138,12 +1138,10 @@
 
     <!-- LEADERBOARD -->
     <div id="view-leaderboard" class="view view-pad">
-      <div class="card" style="padding:6px 16px">
-        <div class="lb-full"><span class="lb-rank">1</span><div class="avatar av-36" style="background:linear-gradient(135deg,#3A6689,#16305A)">V</div><div class="row-txt"><div class="row-name">valen_arc</div></div><div class="lb-pts">18,420 pts</div></div>
-        <div class="lb-full"><span class="lb-rank">2</span><div class="avatar av-36" style="background:linear-gradient(135deg,#5C8FB8,#1B3158)">L</div><div class="row-txt"><div class="row-name">Loki</div></div><div class="lb-pts">15,910 pts</div></div>
-        <div class="lb-full"><span class="lb-rank">3</span><div class="avatar av-36" style="background:linear-gradient(135deg,#16305A,#5C8FB8)">K</div><div class="row-txt"><div class="row-name">Kaia Ito</div></div><div class="lb-pts">14,205 pts</div></div>
-        <div class="lb-full"><span class="lb-rank">4</span><div class="avatar av-36" style="background:linear-gradient(135deg,#5C8FB8,#3A6689)">A</div><div class="row-txt"><div class="row-name">ArcClub</div></div><div class="lb-pts">12,760 pts</div></div>
-        <div class="lb-full"><span class="lb-rank">5</span><div class="avatar av-36" style="background:var(--grad)">C</div><div class="row-txt"><div class="row-name">Clout</div></div><div class="lb-pts">11,040 pts</div></div>
+      <div class="card" style="padding:6px 16px" id="leaderboardCard">
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none;border-radius:50%"></i><div style="flex:1"><i style="width:55%;height:12px;margin:8px 0 6px"></i><i style="width:35%;height:10px"></i></div></div>
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none;border-radius:50%"></i><div style="flex:1"><i style="width:48%;height:12px;margin:8px 0 6px"></i><i style="width:30%;height:10px"></i></div></div>
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none;border-radius:50%"></i><div style="flex:1"><i style="width:52%;height:12px;margin:8px 0 6px"></i><i style="width:38%;height:10px"></i></div></div>
       </div>
     </div>
 
@@ -1287,6 +1285,7 @@
         <button class="btn-post" id="tradeSellBtn" type="button" style="flex:1;background:var(--fill-2);color:var(--ink)">Sell 1 share</button>
       </div>
       <p id="tradeStatus" style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center;min-height:16px"></p>
+      <div id="tradeHistory" style="margin-top:12px"></div>
     </div>
   </div>
 </div>

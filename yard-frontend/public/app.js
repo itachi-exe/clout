@@ -134,6 +134,20 @@
       btn.classList.add("connected");
       setIdentityState("ready");
       logActivity("success", "Wallet connected: " + short(account));
+      // Onboarding: if new user has no handle, prompt them to set one
+      fetch(API + "/api/me", { headers:{ Authorization:"Bearer "+signedIn.token } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.user && !data.user.handle){
+            setTimeout(() => {
+              showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
+              setTimeout(() => {
+                const profileBtn = document.getElementById("profileEditBtn");
+                if (profileBtn) profileBtn.click();
+              }, 1800);
+            }, 600);
+          }
+        }).catch(() => {});
       if (typeof loadFeed === "function") loadFeed();
       if (typeof loadNotifications === "function") loadNotifications();
       if (typeof loadWallet === "function") loadWallet();
@@ -503,7 +517,7 @@
       const r = await fetch(API + "/api/posts/" + p.id + "/shares" + (account ? "?holder=" + account : ""));
       const d = await r.json();
       document.getElementById("tradeSupply").textContent = d.supply;
-      // Show price after fees (what user actually pays) using contract view
+      // Show price after fees
       const { ethers } = await import("https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm");
       const provider = new ethers.JsonRpcProvider("https://rpc.testnet.arc.io");
       const abi = ["function getBuyPriceAfterFee(uint256 postId, uint256 amount) view returns (uint256)"];
@@ -512,6 +526,23 @@
       document.getElementById("tradeBuyPrice").textContent = fmtUsdc(buyPrice.toString());
       document.getElementById("tradeHeld").textContent = d.heldByViewer || 0;
       document.getElementById("tradeSellBtn").disabled = !d.heldByViewer;
+      // Load trade history
+      const hist = await fetch(API + "/api/posts/" + p.id + "/shares/trades?limit=5").then(r => r.json()).catch(() => ({ trades: [] }));
+      const histEl = document.getElementById("tradeHistory");
+      if (histEl && hist.trades && hist.trades.length) {
+        histEl.innerHTML = hist.trades.map(t => {
+          const who = t.trader_handle ? "@" + t.trader_handle : t.trader.slice(0,6) + "…" + t.trader.slice(-4);
+          const action = t.is_buy ? "bought" : "sold";
+          const color = t.is_buy ? "var(--repost)" : "var(--like)";
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:12px">
+            <span style="color:var(--muted)">${who}</span>
+            <span style="color:${color};font-weight:600">${action}</span>
+            <span style="color:var(--muted);font-family:var(--mono)">${fmtUsdc(t.usdc_amount)}</span>
+          </div>`;
+        }).join("");
+      } else if (histEl) {
+        histEl.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No trades yet. Be the first.</div>';
+      }
     } catch(e) {
       document.getElementById("tradeStatus").textContent = "Could not load market data";
     }
@@ -1348,6 +1379,32 @@
       more.before(pill);
       pill.addEventListener("click", () => openBuySheet(p.author, pill));
       getBuyPriceLive(p.author).then(price => { if (price) pill.textContent = "Buy " + formatUsdcShort(price); }).catch(() => {});
+
+      // Delete button — only for own posts
+      if (account && p.author && p.author.toLowerCase() === account.toLowerCase()){
+        more.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!confirm("Delete this post?")) return;
+          const t = sessionToken;
+          if (!t) return;
+          fetch(API + "/api/posts/" + p.id, {
+            method: "DELETE",
+            headers: { Authorization: "Bearer " + t }
+          }).then(r => r.json()).then(d => {
+            if (d.deleted) {
+              el.style.transition = "opacity .2s";
+              el.style.opacity = "0";
+              setTimeout(() => el.remove(), 200);
+              showToast("Post deleted");
+            } else {
+              showToast(d.error || "Could not delete", { kind:"error" });
+            }
+          }).catch(() => showToast("Could not delete", { kind:"error" }));
+        });
+        more.setAttribute("title", "Delete post");
+      } else {
+        more.addEventListener("click", () => showToast("More options are on the way"));
+      }
     }
     return el;
   };

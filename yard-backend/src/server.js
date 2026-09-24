@@ -433,6 +433,27 @@ app.post("/api/posts/:id/repost", writeRateLimit, requireAuth, (req, res) => {
   res.json({ reposted: true });
 });
 
+app.delete("/api/posts/:id", requireAuth, (req, res) => {
+  const postId = parseInt(req.params.id);
+  const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(postId);
+  if (!post) return res.status(404).json({ error: "post not found" });
+  if (post.author !== req.user) return res.status(403).json({ error: "not your post" });
+
+  db.transaction(() => {
+    db.prepare("DELETE FROM likes WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM reposts WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM comments WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM post_share_holdings WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM post_share_trades WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM post_shares WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM notifications WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM posts WHERE id = ?").run(postId);
+    db.prepare("UPDATE users SET points = MAX(points - 3, 0) WHERE address = ?").run(post.author);
+  })();
+
+  res.json({ deleted: true });
+});
+
 // ---------------------------------------------------------------- notifications
 app.get("/api/notifications", requireAuth, (req, res) => {
   const rows = db
