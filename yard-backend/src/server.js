@@ -465,6 +465,7 @@ app.get("/api/users/:address", optionalAuth, (req, res) => {
   if (!ethers.isAddress(address)) return res.status(400).json({ error: "invalid address" });
   const user = db.prepare("SELECT address, handle, display_name, bio, avatar_data, points, account_type, verification_label, created_at FROM users WHERE address = ?").get(address);
   if (!user) return res.status(404).json({ error: "user not found" });
+  res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
   const rawPosts = db.prepare(
     `SELECT p.*, u.handle, u.display_name, u.account_type, u.verification_label, u.avatar_data,
       (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comment_count

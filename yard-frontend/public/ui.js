@@ -61,7 +61,7 @@
     const cls = "ay-av " + (size || "s40");
     const name = u.display_name || u.handle || u.address || u.author || "";
     const seed = u.address || u.author || name;
-    if (u.avatar_data) return '<div class="' + cls + '"><img src="' + esc(u.avatar_data) + '" alt=""></div>';
+    if (u.avatar_data) return '<div class="' + cls + '"><img src="' + esc(u.avatar_data) + '" alt="" loading="lazy" decoding="async" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"></div>';
     return '<div class="' + cls + '" style="' + monogramStyle(seed) + '">' + esc(initialFor(u.display_name || u.handle, seed)) + "</div>";
   }
 
