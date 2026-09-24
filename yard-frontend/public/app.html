@@ -513,8 +513,17 @@
     /* sidebar post button hidden on mobile — not yet */
     .sidebar-post{display:none}
 
-    /* FAB hidden on mobile — not yet (like Games, NFTs) */
-    .mob-fab{display:none}
+    /* ── FAB — floating compose button ── */
+    .mob-fab{
+      position:fixed;bottom:76px;right:14px;z-index:55;
+      width:48px;height:48px;border-radius:12px;
+      background:#fff;border:none;cursor:pointer;
+      display:grid;place-items:center;
+      box-shadow:0 2px 16px rgba(0,0,0,.6);
+      transition:transform .22s var(--ease),opacity .22s var(--ease)}
+    .mob-fab:active{transform:scale(.92)}
+    .mob-fab svg{width:20px;height:20px;color:#000;stroke-width:2}
+    body.chrome-hidden .mob-fab{transform:translateY(90px);opacity:0;pointer-events:none}
     .ay-post .ay-act.share{margin-right:0}
     #posts{padding-bottom:84px}
 
