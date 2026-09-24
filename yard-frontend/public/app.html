@@ -516,13 +516,13 @@
     /* ── FAB — floating compose button ── */
     .mob-fab{
       position:fixed;bottom:76px;right:14px;z-index:55;
-      width:48px;height:48px;border-radius:12px;
+      width:40px;height:40px;border-radius:10px;
       background:#fff;border:none;cursor:pointer;
       display:grid;place-items:center;
-      box-shadow:0 2px 16px rgba(0,0,0,.6);
+      box-shadow:0 2px 12px rgba(0,0,0,.5);
       transition:transform .22s var(--ease),opacity .22s var(--ease)}
     .mob-fab:active{transform:scale(.92)}
-    .mob-fab svg{width:20px;height:20px;color:#000;stroke-width:2}
+    .mob-fab svg{width:17px;height:17px;color:#000;stroke-width:2}
     body.chrome-hidden .mob-fab{transform:translateY(90px);opacity:0;pointer-events:none}
     .ay-post .ay-act.share{margin-right:0}
     #posts{padding-bottom:84px}
@@ -846,6 +846,23 @@
   .game-row .gn{font-size:15px;font-weight:600;color:var(--text-hi)}
   .game-row .gp{font-size:13px;color:var(--text-mut);margin-top:2px;font-weight:400}
   .game-row .row-cta.soon{background:var(--fill) !important;color:var(--text-mut) !important}
+
+  /* ── compose bottom sheet (mobile FAB) ── */
+  .compose-sheet{position:fixed;inset:0;z-index:320;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55)}
+  .compose-sheet.open{display:flex;animation:profileIn .2s var(--ease)}
+  .compose-panel{width:min(100%,520px);background:var(--navy-1);border-radius:20px 20px 0 0;
+    padding:10px 16px calc(16px + env(safe-area-inset-bottom));
+    animation:wsUp .28s var(--ease)}
+  .compose-grab{width:36px;height:4px;border-radius:2px;background:var(--fill-2);margin:0 auto 14px}
+  .compose-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .compose-head span{font-size:16px;font-weight:700;color:var(--text-hi)}
+  .compose-head button{background:transparent;border:none;color:var(--text-mut);font-size:22px;
+    cursor:pointer;line-height:1;padding:0 2px}
+  .compose-sheet .composer{padding:0;margin:0;background:transparent;border:none}
+  .compose-sheet .composer-top{gap:12px}
+  .compose-sheet .composer-input{font-size:16px;height:80px;padding-top:4px}
+  .compose-sheet .composer-bottom{padding-left:50px;margin-top:12px}
+  .compose-sheet .btn-post{padding:9px 22px;font-size:14px}
 
   /* wallet picker sheet: phone browsers have no injected wallet */
   .wallet-sheet{position:fixed;inset:0;z-index:320;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6)}
@@ -1230,6 +1247,27 @@
     <button class="ws-cancel" id="tradeSend" type="button" style="background:var(--text-hi);color:var(--navy-0);margin-bottom:8px">Buy keys</button>
     <button class="ws-cancel" type="button" data-close>Cancel</button>
   </section>
+</div>
+
+<div class="compose-sheet" id="composeSheet">
+  <div class="compose-panel">
+    <div class="compose-grab"></div>
+    <div class="compose-head">
+      <span>New post</span>
+      <button id="composeSheetClose" aria-label="Close">×</button>
+    </div>
+    <section class="composer" aria-label="Share an update">
+      <div class="composer-top">
+        <div class="avatar av-40" id="sheetComposerAvatar" style="background:linear-gradient(135deg,#5C8FB8,#16305A)">A</div>
+        <textarea class="composer-input" id="sheetComposerInput" aria-label="Write an ArcYard update" placeholder="What's on your mind?"></textarea>
+      </div>
+      <div class="composer-bottom">
+        <svg class="tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
+        <span class="count num" id="sheetCount">0/840</span>
+        <button class="btn-post" id="sheetPostBtn" type="button">Post</button>
+      </div>
+    </section>
+  </div>
 </div>
 
 <button class="mob-fab" id="mobFab" aria-label="New post" type="button">

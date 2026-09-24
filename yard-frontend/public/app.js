@@ -457,12 +457,30 @@
     }
   }catch(e){}
 
-  // FAB + sidebar Post button — both route through the real nav so state stays consistent
+  // FAB + sidebar Post button
+  const composeSheet = document.getElementById("composeSheet");
+  const sheetInput = document.getElementById("sheetComposerInput");
+  const sheetCount = document.getElementById("sheetCount");
+  const sheetPostBtn = document.getElementById("sheetPostBtn");
+
+  function openComposeSheet() {
+    if (composeSheet && window.innerWidth <= 768) {
+      composeSheet.classList.add("open");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => sheetInput && sheetInput.focus(), 200);
+    } else {
+      openComposer();
+    }
+  }
+  function closeComposeSheet() {
+    if (!composeSheet) return;
+    composeSheet.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
   function openComposer() {
-    // navigate to Home via the real nav click
     const homeItem = document.querySelector(".nav-item");
     if (homeItem) homeItem.click();
-    // focus the composer
     const input = document.querySelector(".composer-input");
     if (input) {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -471,10 +489,63 @@
   }
 
   const mobFab = document.getElementById("mobFab");
-  if (mobFab) mobFab.addEventListener("click", openComposer);
+  if (mobFab) mobFab.addEventListener("click", openComposeSheet);
 
   const sidebarPost = document.getElementById("sidebarPost");
   if (sidebarPost) sidebarPost.addEventListener("click", openComposer);
+
+  document.getElementById("composeSheetClose")?.addEventListener("click", closeComposeSheet);
+  composeSheet?.addEventListener("click", e => { if (e.target === composeSheet) closeComposeSheet(); });
+
+  // sheet character count
+  if (sheetInput && sheetCount) {
+    sheetInput.addEventListener("input", () => {
+      sheetCount.textContent = sheetInput.value.length + "/840";
+    });
+  }
+
+  // sheet post button: submit then close
+  if (sheetPostBtn && sheetInput) {
+    sheetPostBtn.addEventListener("click", async () => {
+      const text = sheetInput.value.trim();
+      if (!text) return;
+      sheetPostBtn.disabled = true;
+      try {
+        const r = await fetch(API + "/api/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(currentToken ? { Authorization: "Bearer " + currentToken } : {}) },
+          body: JSON.stringify({ text })
+        });
+        if (r.ok) {
+          sheetInput.value = "";
+          if (sheetCount) sheetCount.textContent = "0/840";
+          closeComposeSheet();
+          // switch to home and reload
+          const homeItem = document.querySelector(".nav-item");
+          if (homeItem) homeItem.click();
+          loadFeed(currentScope);
+        } else {
+          const err = await r.json().catch(() => ({}));
+          alert(err.error || "Failed to post");
+        }
+      } catch(e) {
+        alert("Network error");
+      } finally {
+        sheetPostBtn.disabled = false;
+      }
+    });
+  }
+
+  // sync sheet avatar when user logs in
+  function syncSheetAvatar() {
+    const el = document.getElementById("sheetComposerAvatar");
+    if (!el) return;
+    if (currentUser && currentUser.avatar_data) {
+      el.innerHTML = avatarMarkup(currentUser.avatar_data, currentUser.handle || account);
+    } else if (account) {
+      el.innerHTML = account.slice(2, 4).toUpperCase();
+    }
+  }
 
   // Chrome recedes while reading, then returns immediately when the reader reverses direction.
   const head = document.getElementById("feedHead");
