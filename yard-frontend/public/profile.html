@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0D0D0F">
-<title>Profile · ArcYard</title>
+<title>Profile · Clout</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Michroma&display=swap" rel="stylesheet">
@@ -128,7 +128,7 @@
 
   <aside class="side">
     <div class="side-card"><h4>Who to follow</h4><div id="suggest"></div></div>
-    <div class="side-card"><h4>About ArcYard</h4><p>The social layer for Arc. Post, reply and build reputation with people building on the stablecoin rail.</p></div>
+    <div class="side-card"><h4>About Clout</h4><p>The social layer for Arc. Post, reply and build reputation with people building on the stablecoin rail.</p></div>
   </aside>
 </div>
 
@@ -144,8 +144,8 @@
 <script>
 (function(){
   const address = (new URLSearchParams(location.search).get("u") || "").toLowerCase();
-  const token = () => { try { return localStorage.getItem("arcyard-token"); } catch(e){ return null; } };
-  const me = (() => { try { return (localStorage.getItem("arcyard-account") || "").toLowerCase(); } catch(e){ return ""; } })();
+  const token = () => { try { return localStorage.getItem("clout-token"); } catch(e){ return null; } };
+  const me = (() => { try { return (localStorage.getItem("clout-account") || "").toLowerCase(); } catch(e){ return ""; } })();
   const page = document.getElementById("page");
   const goHome = () => { location.href = "/app"; };
   function toast(msg, opts){ AY.toast(msg, opts); }
@@ -183,7 +183,7 @@
     const name = u.display_name || u.handle || AY.short(u.address);
     const isMe = me && me === u.address;
     const isAI = u.account_type === "automated";
-    document.title = name + " · ArcYard";
+    document.title = name + " · Clout";
     document.getElementById("topName").innerHTML = AY.esc(name) + AY.badge(u);
     document.getElementById("topCount").textContent = d.posts.length + (d.posts.length === 1 ? " post" : " posts");
 

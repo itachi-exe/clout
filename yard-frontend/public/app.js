@@ -1,11 +1,11 @@
 (function(){
   // theme
-  try{var st=localStorage.getItem('arcyard-theme');if(st==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}
+  try{var st=localStorage.getItem('clout-theme');if(st==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}
   var tgl=document.getElementById('themeTgl');
   if(tgl)tgl.addEventListener('click',function(){
     var d=document.documentElement,l=d.getAttribute('data-theme')==='light';
     if(l){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme','light');}
-    try{localStorage.setItem('arcyard-theme',l?'dark':'light');}catch(e){}
+    try{localStorage.setItem('clout-theme',l?'dark':'light');}catch(e){}
   });
   // Arc Testnet params, verified live on-chain (chainId 5042002, EIP-1559, gas token USDC)
   const ARC = {
@@ -22,7 +22,7 @@
   const label = btn.querySelector("span");
   const short = a => a.slice(0,6) + "…" + a.slice(-4);
   // hide testnet notice if already dismissed
-  try{ if(localStorage.getItem('arcyard-notice-dismissed')) { const n=document.getElementById('testnetNotice'); if(n) n.style.display='none'; } }catch(e){}
+  try{ if(localStorage.getItem('clout-notice-dismissed')) { const n=document.getElementById('testnetNotice'); if(n) n.style.display='none'; } }catch(e){}
 
   // --- real activity log: every meaningful success/failure lands here, not just a vanishing toast ---
   const ACTIVITY_LOG_LIMIT = 50;
@@ -116,7 +116,7 @@
     if (!r2.ok) throw new Error("sign-in verification failed");
     const data = await r2.json();
     sessionToken = data.token;
-    try{ localStorage.setItem("arcyard-token", data.token); localStorage.setItem("arcyard-account", address); }catch(e){}
+    try{ localStorage.setItem("clout-token", data.token); localStorage.setItem("clout-account", address); }catch(e){}
     currentUser = data.user;
     return data;
   }
@@ -444,8 +444,8 @@
 
   // restore session on reload
   try{
-    const savedToken = localStorage.getItem("arcyard-token");
-    const savedAccount = localStorage.getItem("arcyard-account");
+    const savedToken = localStorage.getItem("clout-token");
+    const savedAccount = localStorage.getItem("clout-account");
     if (savedToken && savedAccount){
       sessionToken = savedToken; account = savedAccount;
       setLabel(short(savedAccount)); btn.classList.add("connected");
@@ -652,7 +652,7 @@
     account = null;
     sessionToken = null;
     currentUser = null;
-    try{ localStorage.removeItem("arcyard-token"); localStorage.removeItem("arcyard-account"); }catch(e){}
+    try{ localStorage.removeItem("clout-token"); localStorage.removeItem("clout-account"); }catch(e){}
     setLabel("Connect Wallet");
     btn.classList.remove("connected");
     setIdentityState("idle");
