@@ -82,6 +82,11 @@
     margin-bottom:34px;opacity:0;animation:riseIn .9s var(--ease) .5s forwards}
   .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:#38E8A0;box-shadow:0 0 12px #38E8A0;
     animation:pulse 2.4s ease-in-out infinite}
+  .stream-wrap{display:inline-flex;align-items:center;gap:0;color:rgba(255,255,255,.55)}
+  .stream-text{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.55)}
+  .stream-cursor{display:inline-block;width:1.5px;height:12px;background:rgba(255,255,255,.5);
+    margin-left:2px;vertical-align:middle;animation:blink .75s step-end infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
   h1{font-family:var(--display);font-size:clamp(30px,5.6vw,76px);line-height:1.08;font-weight:400;letter-spacing:.01em;
     color:var(--text-hi);max-width:20ch;margin-bottom:28px}
   h1 .line{display:block;overflow:hidden}
@@ -185,7 +190,7 @@
   </nav>
 
   <main class="hero">
-    <div class="eyebrow"><span class="dot"></span>Live on Arc Testnet</div>
+    <div class="eyebrow"><span class="dot"></span>Live on Arc Testnet &nbsp;<span class="stream-wrap"><span class="stream-text" id="streamText"></span><span class="stream-cursor"></span></span></div>
     <h1>
       <div class="line"><span>The social layer</span></div>
       <div class="line"><span class="grad">for Arc.</span></div>
@@ -356,6 +361,55 @@
   }
 
   build();
+})();
+
+// ── Stream text: explains how users use Clout ──
+(function(){
+  const el = document.getElementById('streamText');
+  if (!el) return;
+
+  const phrases = [
+    'post on Arc.',
+    'build reputation.',
+    'follow builders.',
+    'trade creator keys.',
+    'earn points on every like.',
+    'tip posts with USDC.',
+    'mint Arc collections.',
+    'grow your following.',
+    'reply to on-chain activity.',
+    'own your social graph.',
+  ];
+
+  let pi = 0, ci = 0, deleting = false, pauseTimer = null;
+  const TYPE_MS = 46, DELETE_MS = 28, PAUSE_MS = 2200, PAUSE_START_MS = 600;
+
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      ci++;
+      el.textContent = phrase.slice(0, ci);
+      if (ci === phrase.length) {
+        deleting = true;
+        pauseTimer = setTimeout(tick, PAUSE_MS);
+        return;
+      }
+      setTimeout(tick, TYPE_MS);
+    } else {
+      ci--;
+      el.textContent = phrase.slice(0, ci);
+      if (ci === 0) {
+        deleting = false;
+        pi = (pi + 1) % phrases.length;
+        setTimeout(tick, PAUSE_START_MS);
+        return;
+      }
+      setTimeout(tick, DELETE_MS);
+    }
+  }
+
+  // start after eyebrow animates in
+  setTimeout(tick, 1400);
 })();
 </script>
 </body>
