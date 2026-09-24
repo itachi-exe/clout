@@ -167,7 +167,7 @@
     width:3px;height:16px;border-radius:2px;background:var(--primary-2)}
 
   /* sidebar post button */
-  .sidebar-post{display:flex;align-items:center;gap:11px;margin-top:10px;width:100%;
+  .sidebar-post{display:flex;align-items:center;gap:11px;margin:0 0 8px;width:100%;
     padding:11px 14px;border:none;cursor:pointer;
     background:var(--primary);color:#04101f;font-weight:700;font-size:14px;
     border-radius:10px;font-family:var(--font);letter-spacing:.01em;
@@ -905,6 +905,11 @@
       <div class="brand-name">ARCYARD</div>
     </a>
 
+    <button class="sidebar-post" id="sidebarPost" type="button" aria-label="New post">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>Post</span>
+    </button>
+
     <nav class="nav">
       <div class="nav-item active">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
@@ -951,11 +956,6 @@
         <span>Profile</span>
       </div>
     </nav>
-
-    <button class="sidebar-post" id="sidebarPost" type="button" aria-label="New post">
-      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      <span>Post</span>
-    </button>
 
     <div class="theme-tgl" id="themeTgl">
       <svg class="ico moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
