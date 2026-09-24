@@ -2,6 +2,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/api/:path*", "destination": "http://94.72.105.176:7080/api/:path*" }
+    { "source": "/api/:path*", "destination": "https://api.cloutonarc.fun/api/:path*" }
   ]
 }
