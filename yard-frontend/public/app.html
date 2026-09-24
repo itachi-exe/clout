@@ -13,6 +13,13 @@
 <link rel="manifest" href="/manifest.json">
 <title>Clout · The social layer for Arc</title>
 <meta name="description" content="Clout is the social layer for Arc. Post, trade, and build reputation on the fastest stablecoin rail." />
+<meta property="og:title" content="Clout · The social layer for Arc">
+<meta property="og:description" content="Post, trade post shares, and build reputation on Arc.">
+<meta property="og:image" content="https://cloutonarc.fun/og-image.png">
+<meta property="og:url" content="https://cloutonarc.fun/app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cloutonarc.fun/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="interaction-states.css">
@@ -930,7 +937,7 @@
   <template id="empty-state-template">
     <div class="empty-state empty-note" role="status">
       <b>Nothing here yet</b>
-      This space fills when ArcYard has something useful to show you.
+      This space fills when Clout has something useful to show you.
     </div>
   </template>
   <!-- ================= LEFT ================= -->
@@ -1027,7 +1034,7 @@
     <section class="composer" aria-label="Share an update">
       <div class="composer-top">
         <div class="avatar av-40" id="composerAvatar" style="background:linear-gradient(135deg,#5C8FB8,#16305A)">A</div>
-        <textarea class="composer-input" aria-label="Write an ArcYard update" placeholder="What's on your mind?"></textarea>
+        <textarea class="composer-input" aria-label="Write a Clout post" placeholder="What's on your mind?"></textarea>
       </div>
       <div class="composer-bottom">
         <svg class="tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
@@ -1178,7 +1185,7 @@
   <!-- ================= RIGHT ================= -->
   <aside class="rail-right">
     <section class="ay-rail-card">
-      <div class="ay-rail-head"><h4>Top of the yard</h4><button type="button" class="ay-rail-link" data-open-view="Leaderboard">See all</button></div>
+      <div class="ay-rail-head"><h4>Top of Clout</h4><button type="button" class="ay-rail-link" data-open-view="Leaderboard">See all</button></div>
       <div id="railLeaderboard">
         <div class="ay-sk"><i style="width:40px;height:40px;flex:none"></i><div style="flex:1"><i style="width:60%;height:11px;margin:6px 0 8px"></i><i style="width:40%;height:10px"></i></div></div>
         <div class="ay-sk"><i style="width:40px;height:40px;flex:none"></i><div style="flex:1"><i style="width:52%;height:11px;margin:6px 0 8px"></i><i style="width:34%;height:10px"></i></div></div>
@@ -1194,7 +1201,7 @@
 <div class="profile-backdrop" id="profileBackdrop" aria-hidden="true">
   <section class="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
     <div class="profile-dialog-head">
-      <div><h2 id="profileTitle">Claim your name</h2><p>Choose how the yard sees you.</p></div>
+      <div><h2 id="profileTitle">Claim your name</h2><p>Choose how Clout sees you.</p></div>
       <button class="profile-close" id="profileClose" type="button" aria-label="Close profile editor">×</button>
     </div>
     <div class="profile-avatar-picker">
@@ -1294,7 +1301,7 @@
     <section class="composer" aria-label="Share an update">
       <div class="composer-top">
         <div class="avatar av-40" id="sheetComposerAvatar" style="background:linear-gradient(135deg,#5C8FB8,#16305A)">A</div>
-        <textarea class="composer-input" id="sheetComposerInput" aria-label="Write an ArcYard update" placeholder="What's on your mind?"></textarea>
+        <textarea class="composer-input" id="sheetComposerInput" aria-label="Write a Clout post" placeholder="What's on your mind?"></textarea>
       </div>
       <div class="composer-bottom">
         <svg class="tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>

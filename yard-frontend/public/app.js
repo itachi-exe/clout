@@ -15,9 +15,8 @@
     rpcUrls: ["https://rpc.testnet.arc.io"],
     blockExplorerUrls: ["https://explorer.testnet.arc.io"]
   };
-  // The deployed testnet contracts predate the audited pull-payment version.
-  // Social features remain available, while any transaction that moves USDC stays paused.
-  const ONCHAIN_ACTIONS_ENABLED = false;
+  // Clout contracts are deployed and live on Arc Testnet
+  const ONCHAIN_ACTIONS_ENABLED = true;
   const btn = document.getElementById("btnLogin");
   const label = btn.querySelector("span");
   const short = a => a.slice(0,6) + "…" + a.slice(-4);
@@ -88,7 +87,7 @@
 
   const API = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
     ? "http://localhost:7080"
-    : ""; // same-origin: Vercel rewrites /api/* to the ArcYard backend server-side
+    : ""; // same-origin: Vercel rewrites /api/* to the Clout backend
 
   function setLabel(t){ label.textContent = t; }
 
@@ -156,7 +155,7 @@
   }
   btn.addEventListener("click", () => account ? openProfile() : connect());
 
-  // --- no injected wallet (phone browsers): open ArcYard inside a wallet's own browser ---
+  // --- no injected wallet (phone browsers): open Clout inside a wallet's own browser ---
   const walletSheet = document.getElementById("walletSheet");
   function openWalletSheet(){
     if (!walletSheet) return;
@@ -185,7 +184,7 @@
     if (event.target.closest("[data-connect-wallet]")) connect();
   });
 
-  // --- ArcYard contract: anchor posts on-chain, then tip them for real ---
+  
   const ARCYARD_CONTRACT = "0xE6295feB75B7ca98389654B610Af772684F7ea3b";
   const ARCYARD_KEYS_CONTRACT = "0x15c7C2c5571b675f313C2A87bfF8B708B3562aBF";
   // function selectors verified via ethers.id() against the exact Solidity signatures, not guessed
@@ -504,7 +503,13 @@
       const r = await fetch(API + "/api/posts/" + p.id + "/shares" + (account ? "?holder=" + account : ""));
       const d = await r.json();
       document.getElementById("tradeSupply").textContent = d.supply;
-      document.getElementById("tradeBuyPrice").textContent = fmtUsdc(d.lastPrice);
+      // Show price after fees (what user actually pays) using contract view
+      const { ethers } = await import("https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm");
+      const provider = new ethers.JsonRpcProvider("https://rpc.testnet.arc.io");
+      const abi = ["function getBuyPriceAfterFee(uint256 postId, uint256 amount) view returns (uint256)"];
+      const shares = new ethers.Contract("0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B", abi, provider);
+      const buyPrice = await shares.getBuyPriceAfterFee(p.id, 1).catch(() => BigInt(d.lastPrice || "0"));
+      document.getElementById("tradeBuyPrice").textContent = fmtUsdc(buyPrice.toString());
       document.getElementById("tradeHeld").textContent = d.heldByViewer || 0;
       document.getElementById("tradeSellBtn").disabled = !d.heldByViewer;
     } catch(e) {
@@ -534,7 +539,7 @@
       const mkt = await fetch(API + "/api/posts/" + tradePost.id + "/shares" + (account ? "?holder=" + account : "")).then(r => r.json());
       const SHARES_ADDR = "0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B";
       const ABI = isBuy
-        ? ["function buyShares(uint256 postId, uint256 amount) payable"]
+        ? ["function buyShares(uint256 postId, uint256 amount) payable", "function getBuyPriceAfterFee(uint256 postId, uint256 amount) view returns (uint256)"]
         : ["function sellShares(uint256 postId, uint256 amount)"];
       if (!window.ethereum) { status.textContent = "No wallet detected"; return; }
       const { ethers } = await import("https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm");
@@ -543,11 +548,10 @@
       const contract   = new ethers.Contract(SHARES_ADDR, ABI, signer);
       let tx;
       if (isBuy) {
-        const price    = BigInt(mkt.lastPrice || "0");
-        const floor    = BigInt("100000000000000000");
-        const base     = price > floor ? price : floor;
-        const withFees = base + base / 10n;
-        tx = await contract.buyShares(tradePost.id, 1, { value: withFees });
+        // Fetch exact price from contract including fees, add 1% slippage buffer
+        const exactCost = await contract.getBuyPriceAfterFee(tradePost.id, 1);
+        const withBuffer = exactCost + exactCost / 100n;
+        tx = await contract.buyShares(tradePost.id, 1, { value: withBuffer });
       } else {
         tx = await contract.sellShares(tradePost.id, 1);
       }
@@ -889,7 +893,7 @@
   let searchTimer, searchSeq = 0;
   function searchIdle(){
     const box = document.querySelector("#view-search .card");
-    if (box) box.innerHTML = AY.empty({ icon:"search", title:"Search the yard", copy:"Find people by name, handle or wallet, and posts by what they say." });
+    if (box) box.innerHTML = AY.empty({ icon:"search", title:"Search Clout", copy:"Find people by name, handle or wallet, and posts by what they say." });
   }
   if (searchInput){
     searchInput.addEventListener("input", () => {
@@ -1020,7 +1024,7 @@
           if (!r.ok){ const e = await r.json(); throw new Error(e.error || "post failed"); }
           ta.value = ""; if (cnt) cnt.textContent = "0/840";
           clearComposePreview(); composeDismissed = null;
-          showToast("Posted to the yard");
+          showToast("Posted to Clout");
           await loadFeed();
           window.scrollTo({ top:0, behavior:"smooth" });
         } catch (e){
@@ -1276,7 +1280,7 @@
     const trade = document.getElementById("view-trade");
     if (trade) trade.innerHTML = AY.empty({ icon:"swap", title:"Trading opens soon", copy:"Creator keys become tradable once the audited contracts are deployed." });
     const games = document.getElementById("view-games");
-    if (games) games.innerHTML = AY.empty({ icon:"game", title:"Games are coming", copy:"Play, compete and earn reputation inside the yard. Not live yet." });
+    if (games) games.innerHTML = AY.empty({ icon:"game", title:"Games are coming", copy:"Play, compete and earn reputation on Clout. Not live yet." });
     const nftChips = document.querySelector("#view-nfts .chip-row");
     if (nftChips) nftChips.remove();
     renderNFTs();

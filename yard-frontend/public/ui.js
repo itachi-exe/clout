@@ -1,4 +1,4 @@
-/* ArcYard shared UI kit. One post renderer and one set of primitives for every page,
+/* Clout shared UI kit. One post renderer and one set of primitives for every page,
    so Home and profiles can never drift apart again. Exposes window.AY. */
 (function(){
   "use strict";
