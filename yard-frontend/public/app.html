@@ -166,6 +166,16 @@
   .nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
     width:3px;height:16px;border-radius:2px;background:var(--primary-2)}
 
+  /* sidebar post button */
+  .sidebar-post{display:flex;align-items:center;gap:11px;margin-top:10px;width:100%;
+    padding:11px 14px;border:none;cursor:pointer;
+    background:var(--primary);color:#04101f;font-weight:700;font-size:14px;
+    border-radius:10px;font-family:var(--font);letter-spacing:.01em;
+    transition:filter .16s var(--ease),transform .16s var(--ease)}
+  .sidebar-post:hover{filter:brightness(1.08)}
+  .sidebar-post:active{transform:scale(.98)}
+  .sidebar-post .ico{width:16px;height:16px;flex:none;stroke-width:2.2}
+
   .btn-login{margin-top:12px;width:100%;padding:14px;border:none;cursor:pointer;
     background:var(--primary);color:#04101f;font-weight:700;font-size:16px;
     border-radius:999px;font-family:var(--font);letter-spacing:.01em;
@@ -454,7 +464,9 @@
     .brand-name,.nav-item span,.btn-login span{display:none}
     .nav-item{justify-content:center;padding:13px}
     .brand{justify-content:center;padding:6px 0 28px}
-    .btn-login{padding:14px}}
+    .btn-login{padding:14px}
+    .sidebar-post span{display:none}
+    .sidebar-post{justify-content:center;padding:11px}}
 
   /* ============ PHONE ============ */
   @media(max-width:768px){
@@ -498,22 +510,11 @@
     /* Show Profile (last item) on mobile too by bumping the cutoff */
     #navProfile{display:flex !important}
 
-    /* FAB sits just above the bar */
-    .mob-fab{bottom:68px}
+    /* sidebar post button hidden on mobile — not yet */
+    .sidebar-post{display:none}
 
-    /* ── FAB — ArcYard rounded-square compose ── */
-    .mob-fab{
-      position:fixed;bottom:76px;right:14px;z-index:55;
-      width:48px;height:48px;border-radius:12px;
-      background:#fff;border:none;cursor:pointer;
-      display:grid;place-items:center;
-      box-shadow:0 2px 16px rgba(0,0,0,.6);
-      transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
-    .mob-fab:active{transform:scale(.92)}
-    .mob-fab svg{width:20px;height:20px;color:#000;stroke-width:2}
-    /* FAB hides with the rest of the chrome while reading, so it never covers post actions */
-    .mob-fab{transition:transform .22s var(--ease),opacity .22s var(--ease)}
-    body.chrome-hidden .mob-fab{transform:translateY(90px);opacity:0;pointer-events:none}
+    /* FAB hidden on mobile — not yet (like Games, NFTs) */
+    .mob-fab{display:none}
     .ay-post .ay-act.share{margin-right:0}
     #posts{padding-bottom:84px}
 
@@ -950,6 +951,11 @@
         <span>Profile</span>
       </div>
     </nav>
+
+    <button class="sidebar-post" id="sidebarPost" type="button" aria-label="New post">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>Post</span>
+    </button>
 
     <div class="theme-tgl" id="themeTgl">
       <svg class="ico moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>

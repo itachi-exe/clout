@@ -457,24 +457,24 @@
     }
   }catch(e){}
 
-  // FAB — mobile compose button
-  const mobFab = document.getElementById("mobFab");
-  if (mobFab) {
-    mobFab.addEventListener("click", () => {
-      // switch to Home view first
-      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-      document.querySelector(".nav-item")?.classList.add("active");
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      document.getElementById("view-home")?.classList.add("active");
-      if (feedTitle) feedTitle.textContent = "Home";
-      // focus the composer
-      const input = document.querySelector(".composer-input");
-      if (input) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => input.focus(), 300);
-      }
-    });
+  // FAB + sidebar Post button — both route through the real nav so state stays consistent
+  function openComposer() {
+    // navigate to Home via the real nav click
+    const homeItem = document.querySelector(".nav-item");
+    if (homeItem) homeItem.click();
+    // focus the composer
+    const input = document.querySelector(".composer-input");
+    if (input) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => input.focus(), 300);
+    }
   }
+
+  const mobFab = document.getElementById("mobFab");
+  if (mobFab) mobFab.addEventListener("click", openComposer);
+
+  const sidebarPost = document.getElementById("sidebarPost");
+  if (sidebarPost) sidebarPost.addEventListener("click", openComposer);
 
   // Chrome recedes while reading, then returns immediately when the reader reverses direction.
   const head = document.getElementById("feedHead");
