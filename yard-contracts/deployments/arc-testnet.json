@@ -1,0 +1,12 @@
+{
+  "contract": "ArcYard",
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "address": "0xE6295feB75B7ca98389654B610Af772684F7ea3b",
+  "treasury": "0xdCe55D57F96090ade201C13f07bE8a8a0a078da0",
+  "deployer": "0x33DfbAF10Dba3655a46d655a14CF6F5A86Cd2e24",
+  "transactionHash": "0x57295747f9971eba55115021c22a1f6ac90291425d29b8075e3a0388eeff6a35",
+  "blockNumber": 63520336,
+  "explorer": "https://explorer.testnet.arc.io/address/0xE6295feB75B7ca98389654B610Af772684F7ea3b",
+  "deployedAt": "2026-09-23T02:29:52.573Z"
+}

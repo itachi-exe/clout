@@ -1,0 +1,25 @@
+/* ArcYard interaction states. Kept separate so state behavior remains auditable. */
+
+.skeleton-loading {
+  background: linear-gradient(100deg, rgba(58, 102, 137, .10) 30%, rgba(222, 232, 234, .10) 48%, rgba(58, 102, 137, .10) 66%);
+  background-size: 220% 100%;
+  animation: arcyard-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes arcyard-shimmer {
+  to { background-position: -220% 0; }
+}
+
+/* This selector doubles as the explicit error state contract for async views. */
+[data-error-state="true"] .empty-note {
+  border-color: rgba(238, 157, 134, .42);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

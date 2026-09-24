@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#020305" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#EEF3F8" media="(prefers-color-scheme: light)" />
+<meta name="color-scheme" content="dark light" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>ArcYard · The social layer for Arc</title>
+<meta name="description" content="ArcYard is the social layer for Arc. Post, trade, and settle on the fastest stablecoin rail." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="interaction-states.css">
+<link rel="stylesheet" href="ui.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Michroma&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-0:#0D0D0F;
+    --navy-1:#161618;
+    --navy-2:#1C1C1E;
+    --navy-3:#262628;
+    --steel:#3A6689;
+    --silver:#DEE8EA;
+    --primary:#5C8FB8;
+    --primary-2:#8FB4D4;
+    --primary-soft:rgba(92,143,184,.12);
+    --grad:linear-gradient(150deg,#0B1E3C 0%,#1A3B63 55%,#3A6689 100%);
+    --grad-arch:linear-gradient(180deg,#F4F8FB 0%,#9FB4C6 100%);
+    --text:#E8E8EA;
+    --text-hi:#F5F5F7;
+    --text-mut:#8A8A8E;
+    --text-dim:#48484A;
+    --line:rgba(255,255,255,.07);
+    --line-2:rgba(255,255,255,.11);
+    --hairline-strong:rgba(255,255,255,.22);
+    --green:#30D158;
+    --red:#FF453A;
+    --radius:14px;
+    --radius-sm:10px;
+    --shadow:0 24px 80px rgba(0,0,0,.7);
+    --shadow-card:none;
+    --bar-bg:rgba(13,13,15,.96);
+    --stuck-bg:linear-gradient(180deg,rgba(13,13,15,.97),rgba(13,13,15,.8));
+    --post-hover:rgba(255,255,255,.025);
+    --glass:var(--navy-1);
+    --glass-2:var(--navy-2);
+    --glass-border:var(--line);
+    --glass-blur:none;
+    --glass-hi:none;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  /* ============ LIGHT THEME ============ */
+  html[data-theme="light"]{
+    --navy-0:#EEF3F8;      /* page canvas */
+    --navy-1:#FFFFFF;      /* cards/surfaces */
+    --navy-2:#E7EEF6;      /* elevated/hover */
+    --navy-3:#DCE6F1;      /* inputs */
+    --steel:#3A6689;
+    --silver:#3A6689;
+    --primary:#2F6EA0;
+    --primary-2:#255C88;
+    --primary-soft:rgba(47,110,160,.12);
+    --grad:linear-gradient(150deg,#2F6EA0 0%,#3A6689 55%,#16305A 100%);
+    --text:#16283F;
+    --text-hi:#0A1730;
+    --text-mut:#516480;
+    --text-dim:#8195AE;
+    --line:rgba(20,45,80,.10);
+    --line-2:rgba(20,45,80,.16);
+    --hairline-strong:rgba(20,45,80,.30);
+    --shadow-card:0 1px 0 rgba(255,255,255,.6), 0 14px 40px -28px rgba(20,45,80,.5);
+    --bar-bg:rgba(255,255,255,.92);
+    --stuck-bg:linear-gradient(180deg,rgba(238,243,248,.92),rgba(238,243,248,.7));
+    --post-hover:rgba(20,45,80,.03);
+    --glass:rgba(255,255,255,.62);
+    --glass-2:rgba(255,255,255,.72);
+    --glass-border:rgba(20,45,80,.12);
+    --glass-blur:blur(16px) saturate(140%);
+    --glass-hi:inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  html[data-theme="light"] body{background:var(--navy-0)}
+  html[data-theme="light"] .glow{
+    background:radial-gradient(ellipse at 50% 0%,rgba(47,110,160,.18) 0%,rgba(47,110,160,.05) 38%,transparent 70%)}
+  html[data-theme="light"] .grid-bg{opacity:.5;
+    background-image:linear-gradient(rgba(20,45,80,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(20,45,80,.06) 1px,transparent 1px)}
+  html[data-theme="light"] .brand-logo{filter:none}
+  html[data-theme="light"] .btn-login,html[data-theme="light"] .btn-post{color:#fff}
+  html[data-theme="light"] .buy:hover{color:#fff}
+  html[data-theme="light"] .feed-head{background:linear-gradient(180deg,var(--navy-0) 60%,transparent)}
+
+ .reply-panel{margin:12px 0 0 57px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--navy-1)}
+ .reply-list{display:grid;gap:9px}.reply{display:flex;gap:8px;font-size:13px;color:var(--text-mut)}.reply b{color:var(--text);font-weight:600}.reply-compose{display:flex;gap:8px;margin-top:12px}.reply-compose input{min-width:0;flex:1;border:0;border-radius:8px;background:var(--navy-2);color:var(--text);padding:9px 10px;font:inherit;font-size:13px}.reply-compose button{border:0;border-radius:8px;background:var(--primary);color:#fff;padding:0 12px;font-weight:700;cursor:pointer}
+ @media(max-width:768px){.reply-panel{margin-left:0}}
+
+  /* theme toggle */
+  .theme-tgl{margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 16px;
+    border-radius:999px;cursor:pointer;color:var(--text-mut);font-size:15px;font-weight:500;
+    transition:background .18s var(--ease),color .18s var(--ease)}
+  .theme-tgl:hover{background:var(--navy-1);color:var(--text)}
+  .theme-tgl .ico{width:22px;height:22px;flex:none}
+  .theme-tgl .moon{display:block}.theme-tgl .sun{display:none}
+  html[data-theme="light"] .theme-tgl .moon{display:none}
+  html[data-theme="light"] .theme-tgl .sun{display:block}
+  @media(max-width:1180px) and (min-width:769px){.theme-tgl span{display:none}.theme-tgl{justify-content:center;padding:13px}}
+  @media(max-width:768px){.theme-tgl{display:none}}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--navy-0);color:var(--text);font-family:var(--font);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    font-size:16px;line-height:1.45}
+  body{overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+  ::selection{background:color-mix(in srgb,var(--primary) 40%,transparent);color:var(--text-hi)}
+  svg{display:block}
+  *{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--hairline-strong)}
+  *:focus-visible{outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 65%,transparent);border-radius:var(--radius-sm)}
+  /* text fields show focus via the caret; no ring box needed */
+  .composer-input:focus-visible,.search-box input:focus-visible,
+  .trade-panel input:focus-visible,textarea:focus-visible,input[type="text"]:focus-visible,
+  input[type="number"]:focus-visible,.reply-compose input:focus-visible,.profile-input:focus-visible{box-shadow:none}
+
+  .glow{display:none}
+  .aurora{display:none}
+  .grid-bg{display:none}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%,100%{opacity:.5}50%{opacity:.9}}
+  @keyframes sweep{100%{transform:translateX(220%)}}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  .app{display:grid;grid-template-columns:284px minmax(0,600px) 372px;
+    gap:30px;max-width:1400px;margin:0 auto;padding:0 24px;min-height:100vh}
+
+  /* ============ LEFT SIDEBAR ============ */
+  .rail-left{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+    padding:24px 8px 24px 4px}
+  .brand{display:flex;align-items:center;gap:13px;padding:6px 12px 28px}
+  .brand-mark{width:44px;height:44px;border-radius:13px;position:relative;
+    background:linear-gradient(160deg,#12294B,#050F26);
+    display:grid;place-items:center;border:1px solid rgba(160,190,224,.16)}
+  .brand-mark::after{content:"";position:absolute;inset:-1px;border-radius:14px;
+    background:radial-gradient(120% 120% at 50% -10%,rgba(143,180,212,.4),transparent 60%);
+    opacity:.6;z-index:-1;filter:blur(6px)}
+  .brand-name{font-family:'Michroma','Inter',sans-serif;font-weight:400;letter-spacing:.1em;font-size:15px;color:var(--text-hi)}
+  .brand-logo{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+  .tc-logo img{width:30px;height:30px;object-fit:contain}
+
+  .nav{display:flex;flex-direction:column;gap:1px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;
+    border-radius:8px;color:var(--text-dim);font-size:13.5px;font-weight:500;position:relative;
+    cursor:pointer;transition:background .14s var(--ease),color .14s var(--ease)}
+  .nav-item .ico{width:18px;height:18px;color:var(--text-dim);flex:none;transition:color .14s var(--ease)}
+  .nav-item:hover{background:rgba(92,143,184,.07);color:var(--text-mut)}
+  .nav-item:hover .ico{color:var(--text-mut)}
+  .nav-item:active{transform:scale(.98)}
+  .nav-item.active{color:var(--text-hi);font-weight:600;background:rgba(92,143,184,.10)}
+  .nav-item.active .ico{color:var(--primary-2)}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:3px;height:16px;border-radius:2px;background:var(--primary-2)}
+
+  .btn-login{margin-top:12px;width:100%;padding:14px;border:none;cursor:pointer;
+    background:var(--primary);color:#04101f;font-weight:700;font-size:16px;
+    border-radius:999px;font-family:var(--font);letter-spacing:.01em;
+    transition:filter .16s var(--ease),transform .16s var(--ease),box-shadow .16s var(--ease);
+    box-shadow:0 8px 24px -12px rgba(92,143,184,.8)}
+  .btn-login:hover{filter:brightness(1.07)}
+  .btn-login:active{transform:scale(.98)}
+  .btn-login.connected{background:var(--navy-2);color:var(--text-hi);
+    border:1px solid var(--line-2);box-shadow:none;font-family:var(--mono);font-size:14px}
+
+  /* ============ CENTER ============ */
+  .feed{padding:0 0 60px;min-width:0}
+  .card{background:var(--navy-1);border:1px solid var(--line);border-radius:var(--radius)}
+
+  /* sticky glass feed header */
+  .feed-head{position:sticky;top:0;z-index:30;display:flex;align-items:center;
+    justify-content:space-between;padding:18px 4px 14px;
+    background:linear-gradient(180deg,var(--navy-0) 60%,transparent);
+    transition:transform .22s var(--ease),backdrop-filter .25s var(--ease)}
+  .feed-head.chrome-hidden{transform:translateY(-120%)}
+  .feed-head.stuck{backdrop-filter:blur(14px);
+    background:var(--stuck-bg)}
+  .feed-title{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--text-hi)}
+  .testnet-notice{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:11px 13px;border:1px solid rgba(245,158,11,.26);border-radius:10px;background:rgba(245,158,11,.08);color:var(--text-mut);font-size:12.5px;line-height:1.45}
+  .testnet-notice b{color:#ffb685;font-weight:700;white-space:nowrap}
+  /* composer */
+  .composer{padding:20px 22px 16px;margin-top:6px}
+  .composer-top{display:flex;gap:14px}
+  .avatar{border-radius:10px;flex:none;display:grid;place-items:center;
+    font-weight:700;color:#fff;overflow:hidden;background:var(--navy-3)}
+  .av-40{width:44px;height:44px;font-size:16px}
+  .av-46{width:46px;height:46px;font-size:17px}
+  .av-36{width:38px;height:38px;font-size:14px}
+  .composer-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);
+    font-size:19px;font-family:var(--font);padding-top:10px;resize:none;height:34px;line-height:1.4}
+  .composer-input::placeholder{color:var(--text-dim)}
+  .composer-bottom{display:flex;align-items:center;margin-top:14px;padding-left:60px;gap:12px}
+  .tool{width:22px;height:22px;color:var(--primary-2);cursor:pointer;
+    transition:transform .16s var(--ease),color .16s var(--ease)}
+  .tool:hover{transform:scale(1.14);color:var(--text-hi)}
+  .scope{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--navy-2);
+    border:1px solid var(--line-2);border-radius:999px;padding:8px 13px;cursor:pointer;
+    font-size:14px;font-weight:600;transition:border-color .16s var(--ease)}
+  .scope:hover{border-color:var(--hairline-strong)}
+  .scope .dot{width:20px;height:20px;border-radius:50%;background:var(--grad);flex:none}
+  .count{color:var(--text-dim);font-size:14px}
+  .btn-post{background:var(--primary);color:#04101f;border:none;border-radius:999px;
+    padding:10px 24px;font-weight:700;font-size:15px;cursor:pointer;font-family:var(--font);
+    transition:filter .16s var(--ease),transform .16s var(--ease)}
+  .btn-post:hover{filter:brightness(1.08)}
+  .btn-post:active{transform:scale(.97)}
+
+  /* tabs */
+  .tabs{display:flex;gap:34px;padding:20px 24px 0;border-bottom:1px solid var(--line);margin-top:2px}
+  .tab{padding-bottom:15px;color:var(--text-mut);font-weight:600;font-size:16px;cursor:pointer;
+    position:relative;transition:color .16s var(--ease)}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--text-hi)}
+  .tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;
+    border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+
+  /* post */
+  .post{padding:16px 16px;border-bottom:1px solid var(--line);
+    transition:background .14s var(--ease);opacity:0;animation:fadeUp .45s var(--ease) forwards}
+  .post:hover{background:rgba(255,255,255,.025)}
+  .post-head{display:flex;gap:10px;align-items:flex-start}
+  .post-id{flex:1;min-width:0}
+  .name-row{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;overflow:hidden}
+  .dname{font-weight:700;color:var(--text-hi);font-size:15px;letter-spacing:-.01em;white-space:nowrap}
+  .badge{width:17px;height:17px;flex:none}
+  .time{color:var(--text-dim);font-size:14px;margin-left:auto;padding-left:8px;white-space:nowrap;flex:none}
+  .handle{color:var(--text-dim);font-size:14px;margin-top:0;white-space:nowrap}
+  .buy{border:1px solid var(--line-2);color:var(--primary-2);background:rgba(92,143,184,.06);
+    border-radius:999px;padding:7px 15px;font-weight:700;font-size:13.5px;cursor:pointer;
+    font-family:var(--mono);white-space:nowrap;transition:all .16s var(--ease)}
+  .buy:hover{background:var(--primary);color:#04101f;border-color:transparent}
+  .more{color:var(--text-dim);cursor:pointer;padding:4px;transition:color .16s var(--ease)}
+  .more:hover{color:var(--text)}
+  .post-body{margin-top:8px;padding-left:0;color:var(--text);font-size:15px;line-height:1.55}
+  .post-body p{margin-bottom:9px}
+  .feed-reason{margin:2px 0 0 57px;color:var(--text-mut);font-size:11px;letter-spacing:.01em}
+ 
+  /* token card — signature moment */
+  .token-card{margin-top:14px;border-radius:16px;overflow:hidden;position:relative;
+    border:1px solid var(--line-2);aspect-ratio:16/10;
+    background:radial-gradient(120% 120% at 30% 15%,#1B3A66 0%,#0F2043 45%,#050F26 100%);
+    transition:transform .3s var(--ease),border-color .3s var(--ease)}
+  .token-card:hover{transform:translateY(-2px);border-color:var(--hairline-strong)}
+  .token-card .glow{position:absolute;inset:0;
+    background:radial-gradient(60% 80% at 72% 62%,rgba(92,143,184,.42),transparent 68%)}
+  .token-card .sheen{position:absolute;top:0;bottom:0;width:40%;
+    background:linear-gradient(105deg,transparent,rgba(222,232,234,.1),transparent);
+    transform:translateX(-120%);animation:sweep 5.5s var(--ease) 1s infinite}
+  .tc-head{position:absolute;top:16px;left:16px;display:flex;gap:11px;align-items:center;z-index:2}
+  .tc-logo{width:42px;height:42px;border-radius:11px;background:var(--grad);display:grid;
+    place-items:center;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
+  .tc-name{font-weight:800;font-size:19px;color:#fff;line-height:1.1;letter-spacing:-.01em}
+  .tc-ticker{color:rgba(230,240,250,.65);font-size:12px;font-weight:600;letter-spacing:.06em;font-family:var(--mono)}
+  .tc-price{position:absolute;left:16px;bottom:16px;z-index:2}
+  .tc-price .p{font-size:29px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .tc-price .chg{color:var(--green);font-weight:700;font-size:14px;margin-top:2px;font-family:var(--mono)}
+  .tc-fdv{position:absolute;right:16px;bottom:16px;text-align:right;z-index:2}
+  .tc-fdv .v{font-size:21px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .tc-fdv .l{color:rgba(230,240,250,.55);font-size:11px;font-weight:600;letter-spacing:.1em;font-family:var(--mono)}
+  .spark{position:absolute;inset:0;z-index:1;opacity:.95}
+  .spark polyline.line{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 2.2s var(--ease) .4s forwards}
+
+  .post-media{margin-top:14px;border-radius:16px;overflow:hidden;border:1px solid var(--line-2);
+    aspect-ratio:16/9;
+    background:radial-gradient(90% 120% at 20% 15%,#1B3A66,transparent 60%),
+      radial-gradient(90% 120% at 90% 90%,#16305A,transparent 60%),var(--navy-0)}
+
+  /* footer actions — Base style: flat icon + count, no background, generous spacing */
+  .actions{display:flex;align-items:center;gap:28px;margin-top:14px;padding-left:0}
+  .act{display:flex;align-items:center;gap:5px;color:var(--text-dim);font-size:13px;font-weight:400;
+    cursor:pointer;padding:0;border-radius:0;background:transparent;font-variant-numeric:tabular-nums;
+    transition:color .12s var(--ease)}
+  .act:hover{color:var(--text-mut);background:transparent}
+  .act .ico{width:18px;height:18px;stroke-width:1.6}
+  .act.val{color:var(--text-mut)}
+  .act.val:hover{color:var(--text-hi)}
+  .act.liked{color:var(--primary-2)}
+  .act.liked .ico{fill:var(--primary-2);stroke:var(--primary-2)}
+  .act.done{color:var(--primary-2)}
+  .act.done .ico{fill:currentColor;stroke:currentColor}
+  .act.anchoring,.act.tipping{opacity:.6;pointer-events:none}
+  .buy-pill{border:0;background:transparent;color:var(--text-mut);
+    border-radius:8px;padding:4px 6px;margin-right:-6px;font:500 12px var(--mono);cursor:pointer;
+    white-space:nowrap;transition:color .14s var(--ease),background .14s var(--ease)}
+  .buy-pill:hover{color:var(--green);background:rgba(48,209,88,.08)}
+  @media (hover:none){.buy-pill:hover{color:var(--text-mut);background:transparent}}
+  .act.tip{margin-left:auto;color:var(--text-dim);padding:0}
+  .act.tip:hover{color:var(--text-mut);background:transparent}
+
+  /* ============ RIGHT SIDEBAR ============ */
+  .rail-right{position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 0 40px;
+    display:flex;flex-direction:column;gap:16px}
+  .feature{border-radius:var(--radius);overflow:hidden;position:relative;height:186px;
+    border:1px solid var(--line-2);
+    background:radial-gradient(120% 120% at 20% 10%,#1B3A66 0%,#0F2043 50%,#050F26 100%)}
+  .feature .fimg{position:absolute;inset:0;
+    background:radial-gradient(90% 120% at 80% 10%,rgba(92,143,184,.4),transparent 60%),
+      radial-gradient(80% 120% at 10% 90%,rgba(58,102,137,.45),transparent 60%)}
+  .feature .fov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,11,28,.94),transparent 55%)}
+  .feature-txt{position:absolute;left:20px;bottom:18px;z-index:2}
+  .feature-txt h3{font-size:21px;font-weight:800;color:#fff;line-height:1.15;max-width:250px;letter-spacing:-.02em}
+  .feature-txt .cta{display:inline-flex;align-items:center;gap:6px;color:var(--primary-2);
+    font-weight:700;margin-top:9px;font-size:14px}
+  .dots{position:absolute;bottom:14px;right:16px;display:flex;gap:6px;z-index:2}
+  .dots i{width:20px;height:4px;border-radius:3px;background:rgba(255,255,255,.22);transition:all .3s var(--ease)}
+  .dots i.on{background:var(--primary-2);width:26px}
+
+  .panel{padding:20px}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .panel-head h4{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--text-mut);text-transform:uppercase}
+  .see{color:var(--primary-2);font-size:13px;font-weight:700;cursor:pointer;transition:color .16s var(--ease)}
+  .see:hover{color:var(--text-hi)}
+
+  .lb-row{display:flex;align-items:center;gap:13px;padding:9px 8px;margin:0 -8px;border-radius:12px;
+    cursor:pointer;transition:background .16s var(--ease)}
+  .lb-row:hover{background:var(--navy-2)}
+  .lb-rank{width:16px;text-align:center;font-weight:700;color:var(--text-dim);font-size:14px;font-family:var(--mono)}
+  .lb-id{flex:1;min-width:0}
+  .lb-name{display:flex;align-items:center;gap:5px;font-weight:700;color:var(--text-hi);font-size:14.5px}
+  .lb-handle{color:var(--text-mut);font-size:12.5px;font-family:var(--mono)}
+
+  .ac-row{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:13.5px;color:var(--text-mut)}
+  .ac-row b{color:var(--text-hi);font-weight:700}
+  .ac-row .buyv{color:var(--green);font-weight:700}
+  .ac-row .sellv{color:var(--red);font-weight:700}
+  .ac-row .num{font-family:var(--mono);color:var(--text)}
+  .ac-row .chip{width:20px;height:20px;border-radius:6px;background:var(--navy-3);flex:none;
+    display:grid;place-items:center}
+  .ac-row .t{margin-left:auto;color:var(--text-dim);font-size:12px;white-space:nowrap;font-family:var(--mono)}
+
+  /* skeleton */
+  .skeleton{position:relative;overflow:hidden;background:var(--navy-2);border-radius:8px}
+  .skeleton::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(150,185,225,.08),transparent);
+    transform:translateX(-100%);animation:sweep 1.5s var(--ease) infinite}
+  .sk-hidden{display:none}
+
+
+
+  /* ---- multi-view system ---- */
+  .view{display:none}
+  .view.active{display:block;animation:riseIn .35s var(--ease)}
+  .view-pad{padding:2px 0 8px}
+  .empty-note{padding:60px 20px;text-align:center;color:var(--text-mut);font-size:14px}
+  .empty-note b{display:block;color:var(--text-hi);font-size:17px;font-weight:700;margin-bottom:8px}
+
+  .search-box{display:flex;align-items:center;gap:10px;background:var(--glass);border:1px solid var(--glass-border);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi);
+    border-radius:14px;padding:13px 16px;margin-bottom:16px}
+  .search-box svg{color:var(--text-mut);flex:none}
+  .search-box input{flex:1;background:none;border:none;outline:none;color:var(--text-hi);font:inherit;font-size:15px}
+  .search-box input::placeholder{color:var(--text-mut)}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{padding:7px 14px;border-radius:999px;background:var(--navy-1);border:1px solid var(--line);
+    font-size:13px;font-weight:600;color:var(--text-mut);cursor:pointer;transition:.18s var(--ease)}
+  .chip:hover,.chip.on{color:var(--text-hi);border-color:var(--primary);background:var(--primary-soft)}
+
+  .row-card{display:flex;align-items:center;gap:13px;padding:14px 4px;border-bottom:1px solid var(--line)}
+  .row-card:last-child{border-bottom:none}
+  .row-txt{flex:1;min-width:0}
+  .row-name{font-weight:700;font-size:14.5px;color:var(--text-hi)}
+  .row-sub{font-size:13px;color:var(--text-mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row-cta{padding:8px 16px;border-radius:999px;background:var(--navy-2);border:1px solid var(--line-2);
+    font-size:13px;font-weight:700;color:var(--text-hi);cursor:pointer;transition:.18s var(--ease)}
+  .row-cta:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+
+  .notif-row{display:flex;gap:13px;padding:15px 4px;border-bottom:1px solid var(--line);position:relative}
+  .notif-row:last-child{border-bottom:none}
+  .notif-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    flex:none;background:var(--primary-soft);color:var(--primary-2)}
+  .notif-row.unread::after{content:"";position:absolute;left:-4px;top:50%;transform:translateY(-50%);
+    width:6px;height:6px;border-radius:50%;background:var(--primary-2);box-shadow:0 0 6px var(--primary-2)}
+  .notif-txt b{color:var(--text-hi)}
+  .notif-txt{font-size:14px;color:var(--text-mut);line-height:1.5}
+  .notif-time{font-size:12px;color:var(--text-mut);margin-top:3px}
+
+  .wallet-hero{background:var(--glass-2);border:1px solid var(--glass-border);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi);
+    border-radius:20px;padding:26px 24px;margin-bottom:20px}
+  .wallet-hero .wl{font-size:13px;color:var(--text-mut);margin-bottom:8px}
+  .wallet-hero .wv{font-family:var(--mono);font-size:34px;font-weight:700;color:var(--text-hi)}
+  .wallet-hero .wv span{color:var(--text-mut);font-size:18px;margin-left:6px}
+  .wallet-actions{display:flex;gap:10px;margin-top:18px}
+  .wallet-actions button{flex:1;padding:12px;border-radius:12px;border:none;font-weight:700;font-size:13.5px;cursor:pointer}
+  .wallet-actions .wa-primary{background:var(--primary);color:#fff}
+  .wallet-actions .wa-ghost{background:var(--navy-2);color:var(--text-hi);border:1px solid var(--line-2)}
+  .asset-row{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line)}
+  .asset-row:last-child{border-bottom:none}
+  .asset-ico{width:34px;height:34px;border-radius:50%;background:var(--navy-2);flex:none;display:flex;
+    align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--primary-2)}
+  .asset-amt{margin-left:auto;text-align:right}
+  .asset-amt .a1{font-family:var(--mono);font-weight:700;color:var(--text-hi);font-size:14px}
+  .asset-amt .a2{font-size:12px;color:var(--text-mut)}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .nft-tile{border-radius:16px;overflow:hidden;border:1px solid var(--glass-border);background:var(--glass);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi)}
+  .nft-img{aspect-ratio:1;background:linear-gradient(135deg,var(--navy-2),var(--primary-soft))}
+  .nft-meta{padding:11px 13px}
+  .nft-meta .nm{font-size:13.5px;font-weight:700;color:var(--text-hi)}
+  .nft-meta .np{font-size:12px;color:var(--text-mut);margin-top:2px}
+
+  .lb-full{display:flex;align-items:center;gap:13px;padding:13px 4px;border-bottom:1px solid var(--line)}
+  .lb-full:last-child{border-bottom:none}
+  .lb-full .lb-rank{width:22px;text-align:center;font-weight:800;color:var(--text-mut)}
+  .lb-full .lb-pts{margin-left:auto;font-family:var(--mono);font-weight:700;color:var(--primary-2);font-size:14px}
+
+  .launch-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:18px;margin-bottom:14px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi)}
+  .launch-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .launch-top .ln{font-weight:800;font-size:15.5px;color:var(--text-hi)}
+  .launch-top .lt{font-size:12px;color:var(--text-mut);margin-top:2px}
+  .launch-bar{height:6px;border-radius:99px;background:var(--navy-2);overflow:hidden;margin:12px 0 8px}
+  .launch-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+  .launch-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text-mut)}
+
+  .trade-panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;padding:20px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi)}
+  .trade-pair{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .trade-pair .tp-name{font-weight:800;font-size:16px;color:var(--text-hi)}
+  .trade-pair .tp-price{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--primary-2)}
+  .trade-tabs{display:flex;gap:8px;margin-bottom:14px}
+  .trade-tabs .tt{flex:1;text-align:center;padding:10px;border-radius:10px;background:var(--navy-2);
+    font-size:13.5px;font-weight:700;color:var(--text-mut);cursor:pointer}
+  .trade-tabs .tt.on{background:var(--primary);color:#fff}
+  .trade-panel input{width:100%;background:var(--navy-2);border:1px solid var(--line-2);border-radius:12px;
+    padding:14px;font-family:var(--mono);font-size:16px;color:var(--text-hi);margin-bottom:12px}
+  .trade-panel button{width:100%;padding:14px;border-radius:12px;border:none;background:var(--primary);
+    color:#fff;font-weight:800;font-size:14.5px;cursor:pointer}
+
+  .game-card{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--glass-border);
+    background:var(--glass);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-hi);
+    padding:20px;min-height:130px;display:flex;
+    flex-direction:column;justify-content:flex-end}
+  .game-card .gn{font-weight:800;font-size:15px;color:var(--text-hi)}
+  .game-card .gp{font-size:12px;color:var(--primary-2);margin-top:4px;font-weight:700}
+
+  /* tablet: icon-only left rail, keep right rail */
+  @media(max-width:1180px) and (min-width:769px){
+    .app{grid-template-columns:84px minmax(0,600px) 332px}
+    .brand-name,.nav-item span,.btn-login span{display:none}
+    .nav-item{justify-content:center;padding:13px}
+    .brand{justify-content:center;padding:6px 0 28px}
+    .btn-login{padding:14px}}
+
+  /* ============ PHONE ============ */
+  @media(max-width:768px){
+    html,body{font-size:15px}
+    .app{display:block;padding:0 0 72px}
+    .grid-bg{display:none}
+
+    /* ── Bottom nav bar — IG style ── */
+    .rail-left{
+      position:fixed;left:0;right:0;bottom:0;top:auto;
+      height:58px;width:100%;flex-direction:row;align-items:stretch;
+      padding:0;z-index:50;background:#0D0D0F;border-top:none;
+      transform:translateY(0);transition:transform .22s var(--ease);
+      backdrop-filter:none}
+    .rail-left.chrome-hidden{transform:translateY(115%)}
+    .brand{display:none}
+    .theme-tgl{display:none}
+    .btn-login{display:none}
+
+    .rail-left nav{
+      display:flex;flex-direction:row;flex:1;
+      justify-content:space-around;align-items:center;
+      padding:0 20px;height:100%}
+    .nav-item{
+      flex:1 1 0;display:flex;justify-content:center;align-items:center;
+      height:100%;padding:10px 0;margin:0;border-radius:0;
+      background:transparent;border:none}
+    .nav-item span{display:none}
+    .nav-item::before{display:none}
+    .nav-item .ico{
+      width:26px;height:26px;
+      color:rgba(255,255,255,.5);
+      stroke-width:1.5;fill:none;
+      display:block}
+    .nav-item.active{background:transparent;border:none}
+    .nav-item.active .ico{
+      color:#fff;
+      stroke-width:0;
+      fill:#fff}
+    .rail-left nav .nav-item:nth-child(n+6){display:none}
+    /* Show Profile (last item) on mobile too by bumping the cutoff */
+    #navProfile{display:flex !important}
+
+    /* FAB sits just above the bar */
+    .mob-fab{bottom:68px}
+
+    /* ── FAB — ArcYard rounded-square compose ── */
+    .mob-fab{
+      position:fixed;bottom:76px;right:14px;z-index:55;
+      width:48px;height:48px;border-radius:12px;
+      background:#fff;border:none;cursor:pointer;
+      display:grid;place-items:center;
+      box-shadow:0 2px 16px rgba(0,0,0,.6);
+      transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+    .mob-fab:active{transform:scale(.92)}
+    .mob-fab svg{width:20px;height:20px;color:#000;stroke-width:2}
+    /* FAB hides with the rest of the chrome while reading, so it never covers post actions */
+    .mob-fab{transition:transform .22s var(--ease),opacity .22s var(--ease)}
+    body.chrome-hidden .mob-fab{transform:translateY(90px);opacity:0;pointer-events:none}
+    .ay-post .ay-act.share{margin-right:0}
+    #posts{padding-bottom:84px}
+
+    /* ── Feed layout ── */
+    .feed{padding:0 0 20px;min-width:0;width:100%}
+    .feed-head{padding:16px 20px 12px;top:0;background:rgba(13,13,15,.96);backdrop-filter:blur(10px)}
+    .feed-head .feed-title{font-size:17px;font-weight:700}
+    .rail-right{display:none}
+
+    /* ── Posts flat ── */
+    .composer{padding:12px 14px 10px;border-radius:0}
+    .composer-bottom{padding-left:0;gap:10px;flex-wrap:nowrap;margin-top:10px}
+    .composer-bottom .count{display:none}
+    .post{padding:12px 14px}
+    .post-body{padding-left:0;font-size:14px}
+    .actions{padding-left:0;gap:22px}
+    .card{border-radius:0}
+
+    .tabs{padding:10px 14px 0;gap:22px;background:var(--navy-0);
+      position:sticky;top:54px;z-index:20;
+      overflow-x:auto;white-space:nowrap}
+    .tab{flex:0 0 auto;font-size:14px}
+
+    .token-card{aspect-ratio:16/11}
+    .tc-name{font-size:17px}
+    .tc-price .p{font-size:23px}
+    .tc-price .p sub{font-size:.6em}
+    .tc-fdv .v{font-size:17px}
+    .tc-price,.tc-fdv,.tc-head{max-width:52%}
+    .tc-fdv{max-width:38%}
+
+    /* header connect wallet button */
+    .feed-head .btn-login{
+      display:inline-flex;align-items:center;
+      width:auto;margin:0;padding:7px 12px;
+      border-radius:8px;font-size:12px;font-weight:600;
+      background:rgba(255,255,255,.1);color:var(--text-hi);box-shadow:none}
+    .feed-head .btn-login.connected{
+      background:transparent;border:1px solid var(--line);
+      color:var(--text-mut);font-size:11px;font-family:var(--mono)}
+  }
+
+  /* ============ DASHBOARD REFINEMENT — now handled in flat block below ============ */
+
+  /* identity is a state, not a nag. The composer stays usable, while its promise becomes precise. */
+  .identity-status{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:8px 10px 8px 9px;border-radius:999px;background:rgba(222,232,234,.06);border:1px solid rgba(222,232,234,.10);color:var(--text-mut);font-size:12px;line-height:1;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
+  .identity-status .status-orb{width:7px;height:7px;border-radius:50%;background:var(--text-dim);flex:none;transition:background .2s var(--ease),box-shadow .2s var(--ease)}
+  .identity-status.ready{background:rgba(55,217,160,.09);border-color:rgba(55,217,160,.20);color:var(--text)}
+  .identity-status.ready .status-orb{background:var(--green);box-shadow:0 0 0 4px rgba(55,217,160,.11)}
+  .identity-status.sending{color:var(--silver);border-color:rgba(222,232,234,.24)}
+  .identity-status.sending .status-orb{background:var(--silver);animation:pulse 1.25s var(--ease) infinite}
+  .composer-context{display:flex;align-items:center;gap:8px;min-height:18px;margin:16px 0 -4px;padding-left:57px;color:var(--text-mut);font-size:12px;line-height:1.4}
+  .composer-context .context-mark{width:15px;height:15px;color:var(--primary-2);flex:none}
+  .composer-context strong{color:var(--text);font-weight:600}
+  .btn-post:disabled{cursor:wait;opacity:.65;filter:none;transform:none}
+  .empty-note .empty-action{display:inline-flex;align-items:center;justify-content:center;min-height:34px;margin-top:17px;padding:0 14px;border:1px solid rgba(222,232,234,.16);border-radius:10px;background:rgba(222,232,234,.08);color:var(--text-hi);font:600 12px var(--font);cursor:pointer;transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease)}
+  .empty-note .empty-action:hover{background:var(--silver);border-color:var(--silver);color:var(--navy-0)}
+  .empty-note .empty-action:active{transform:scale(.98)}
+
+  /* Legacy desktop, refined */
+  body{background:var(--navy-0)}
+  .glow,.aurora,.grid-bg{display:none}
+  .app{grid-template-columns:230px minmax(0,630px) 310px;gap:0;max-width:1320px;padding:0}
+  .rail-left{padding-top:20px;border-right:1px solid var(--line)}
+  .brand{padding:8px 16px 32px}
+  .brand-mark{width:38px;height:38px;border-radius:10px;background:transparent;border:none}
+  .brand-name{font-size:13px;letter-spacing:.1em}
+  .nav{gap:2px;padding:0 8px}
+  .nav-item{gap:12px;padding:9px 12px;font-size:14px;border-radius:8px}
+  .nav-item .ico{width:18px;height:18px}
+  .nav-item.active{background:rgba(255,255,255,.06)}
+  .btn-login{margin:16px 16px 0;width:calc(100% - 32px);padding:11px;font-size:14px;border-radius:10px;background:rgba(255,255,255,.1);color:var(--text-hi);box-shadow:none}
+  .btn-login.connected{background:transparent;color:var(--text-mut);border:1px solid var(--line);font-size:13px}
+  .feed{padding-bottom:80px;border-right:1px solid var(--line)}
+  .feed-head{padding:20px 16px 14px;background:rgba(13,13,15,.96);backdrop-filter:blur(10px)}
+  .feed-title{font-size:16px;font-weight:700;letter-spacing:-.01em;color:var(--text-hi);text-transform:none}
+  .card{background:transparent;border:none;border-radius:0;border-bottom:1px solid var(--line)}
+  .panel{padding:16px}
+  .card.panel{background:var(--navy-1);border:none;border-bottom:1px solid var(--line);border-radius:0}
+  .dashboard-intro{padding:20px 16px;background:transparent;border-bottom:1px solid var(--line);margin:0;min-height:0}
+  .dashboard-intro::after{display:none}
+  .dashboard-intro h1{font-size:22px;font-weight:700;letter-spacing:-.02em}
+  .dashboard-intro p{font-size:13px;margin-top:6px}
+  .arc-stats{margin-top:14px;gap:24px}
+  .arc-stat b{font-size:13px}
+  .eyebrow{font-size:10px;letter-spacing:.08em;margin-bottom:10px}
+  .identity-status{margin-top:12px;font-size:11px}
+  .composer{padding:14px 16px 12px;background:transparent;border-radius:0;border-bottom:1px solid var(--line)}
+  .composer-input{font-size:16px;height:36px;padding-top:6px}
+  .composer-bottom{margin-top:12px;padding-left:48px}
+  .scope{background:transparent;border:0;padding:6px 0;font-size:12px;color:var(--text-dim)}
+  .scope .dot{width:7px;height:7px}
+  .btn-post{padding:8px 18px;border-radius:8px;background:rgba(255,255,255,.1);color:var(--text-hi);font-size:13px;font-weight:700}
+  .btn-post:hover{background:rgba(255,255,255,.16)}
+  .tabs{padding:12px 16px 0;gap:24px;border-bottom:1px solid var(--line);background:transparent}
+  .tab{font-size:14px;font-weight:500;padding-bottom:12px;color:var(--text-dim)}
+  .tab.active{color:var(--text-hi)}
+  .tab.active::after{height:2px;background:var(--text-hi)}
+  .post{padding:14px 16px;border-bottom-color:var(--line)}
+  .post:hover{background:rgba(255,255,255,.025)}
+  .post-body{padding-left:0;font-size:14.5px}
+  .actions{padding-left:0}
+  .buy{border-color:var(--line-2);background:transparent;font-size:12px;padding:5px 12px}
+  .dname{font-size:15px}
+  .rail-right{padding:16px;gap:0}
+  .dashboard-brief,.feature,.card.panel{background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;backdrop-filter:none}
+  .feature{height:180px;border-radius:10px;border:1px solid var(--line);margin-bottom:16px}
+  .brief-main{font-size:15px}
+  .lb-row{padding:8px 4px}
+  .panel-head h4{font-size:11px}
+  .card{backdrop-filter:none;-webkit-backdrop-filter:none}
+  @media(max-width:1180px) and (min-width:769px){.app{grid-template-columns:64px minmax(0,1fr) 0px}.rail-right{display:none}.brand-name,.nav-item span,.btn-login span{display:none}.nav-item{justify-content:center;padding:12px}.brand{justify-content:center;padding-inline:0}.btn-login{padding:12px;margin:12px 8px 0;width:calc(100% - 16px)}}
+  @media(max-width:768px){.app{padding:0 0 76px}.feed{padding-left:16px;padding-right:16px}.feed-head{padding:16px 0 12px}.post{padding:12px 0}.actions{padding-left:0}.post-body{padding-left:0}.nav-item.active{background:transparent;border:none}.nav-item.active .ico{color:#fff;fill:currentColor;stroke-width:2}}
+  /* Header owns identity. The rail owns navigation. Keeping those jobs separate fixes the mobile collision. */
+  .header-actions{display:flex;align-items:center;gap:9px}
+  .feed-head .btn-login{width:auto;margin:0;padding:7px 14px;border-radius:8px;background:rgba(255,255,255,.1);color:var(--text-hi);box-shadow:none;font-size:13px;font-weight:600}
+  .feed-head .btn-login.connected{background:transparent;border:1px solid var(--line);color:var(--text-mut);font-size:12px}
+
+  /* real activity log — replaces the old vague status dot */
+  .log-btn{position:relative;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--text-mut);cursor:pointer}
+  .log-btn:hover{background:var(--fill);color:var(--text-hi)}
+  .log-btn .ico{width:18px;height:18px}
+  .log-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:transparent;transition:background .15s var(--ease)}
+  .log-dot.has-error{background:var(--red);box-shadow:0 0 0 3px rgba(255,69,58,.18)}
+  .log-dot.has-info{background:var(--primary-2)}
+  .log-panel{position:fixed;top:64px;right:20px;z-index:250;width:320px;max-height:420px;
+    background:var(--navy-1);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);display:none;flex-direction:column;overflow:hidden}
+  .log-panel.open{display:flex;animation:profileIn .15s var(--ease)}
+  .log-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .log-panel-head h4{font-size:12.5px;font-weight:700;color:var(--text-hi)}
+  .log-clear{background:transparent;border:0;color:var(--text-mut);font-size:12px;cursor:pointer;padding:4px 6px;border-radius:6px}
+  .log-clear:hover{background:var(--fill);color:var(--text-hi)}
+  .log-list{overflow-y:auto;padding:6px 0}
+  .log-empty{padding:24px 14px;text-align:center;color:var(--text-dim);font-size:12.5px}
+  .log-row{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line)}
+  .log-row:last-child{border-bottom:0}
+  .log-row .log-ico{flex:none;width:16px;height:16px;margin-top:2px}
+  .log-row.error .log-ico{color:var(--red)}
+  .log-row.info .log-ico{color:var(--primary-2)}
+  .log-row.success .log-ico{color:var(--green)}
+  .log-row-body{min-width:0;flex:1}
+  .log-row-msg{font-size:12.5px;color:var(--text-hi);line-height:1.4;word-break:break-word}
+  .log-row-time{font-size:10.5px;color:var(--text-dim);margin-top:2px;font-family:var(--mono)}
+  @media(max-width:768px){.log-panel{right:12px;left:12px;width:auto;top:60px}}
+  @media(max-width:768px){
+    .feed-head{min-height:54px;padding-top:16px !important;padding-bottom:12px !important;padding-left:20px !important;padding-right:20px !important}
+    .feed-head .feed-title{font-size:13px;letter-spacing:.1em}
+    .header-actions{gap:7px}
+
+    .feed-head .btn-login{position:static;inset:auto;display:inline-flex;align-items:center;min-height:34px;padding:7px 10px;font-size:11px;white-space:nowrap}
+    .dashboard-intro{padding:19px 18px 17px;margin-bottom:12px}
+    .dashboard-intro .eyebrow{margin-bottom:11px;font-size:10px}
+    .dashboard-intro h1{font-size:clamp(31px,9.25vw,36px);line-height:1.02}
+    .dashboard-intro p{margin-top:11px;font-size:14px;line-height:1.45}
+    .arc-stats{margin-top:17px;gap:19px}
+    .arc-stat{gap:3px}.arc-stat b{font-size:12px}.arc-stat span{font-size:10px}
+    .identity-status{margin-top:14px;padding:7px 9px;font-size:10.5px;max-width:100%}
+    .composer{margin-top:0;padding:14px 15px 12px}
+    .composer .eyebrow{margin-bottom:9px;font-size:10px}
+    .composer .avatar{width:40px;height:40px;font-size:14px}
+    .composer-input{min-width:0;height:48px;font-size:16px;line-height:1.35;padding-top:4px}
+    .composer-context{margin:10px 0 -2px;padding-left:48px;font-size:11px;line-height:1.35}
+    .composer-bottom{margin-top:8px;padding-left:48px}
+    .btn-post{padding:8px 17px;font-size:13px}
+  }
+  /* Adaptive shell: each rail earns its width. Never hide overflow to fake a responsive layout. */
+  @media (min-width:1220px){
+    .app{grid-template-columns:230px minmax(0,1fr) 310px;gap:clamp(24px,3vw,42px);max-width:1520px;padding-inline:clamp(20px,3vw,36px)}
+  }
+  @media (min-width:1150px) and (max-width:1219px){
+    .app{grid-template-columns:76px minmax(0,1fr) 270px;gap:24px;max-width:none;padding-inline:18px}
+    .brand-name,.nav-item span,.btn-login span{display:none}
+    .brand{justify-content:center;padding-inline:0}.nav-item{justify-content:center;padding:13px}
+    .btn-login{padding:14px}.rail-right{padding-top:78px}
+  }
+  @media (min-width:900px) and (max-width:1149px){
+    .app{grid-template-columns:210px minmax(0,1fr);gap:28px;max-width:none;padding-inline:22px}
+    .rail-right{display:none}.rail-left{padding-right:0}.feed{width:100%;max-width:none}
+    .dashboard-intro{padding:30px}.dashboard-intro h1{font-size:clamp(38px,5vw,50px)}
+  }
+  @media (min-width:769px) and (max-width:899px){
+    .app{grid-template-columns:72px minmax(0,1fr);gap:18px;max-width:none;padding-inline:18px}
+    .rail-right{display:none}.brand-name,.nav-item span,.btn-login span{display:none}
+    .brand{justify-content:center;padding-inline:0}.nav-item{justify-content:center;padding:12px}
+    .btn-login{padding:12px}.feed{width:100%;max-width:none}
+    .dashboard-intro{padding:28px}.dashboard-intro h1{font-size:clamp(36px,6vw,46px)}
+  }
+  /* Profile identity: one composed edit surface, not an onboarding maze. */
+  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .profile-backdrop{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.7);backdrop-filter:none}
+  .profile-backdrop.open{display:flex;animation:profileIn .18s var(--ease)}
+  @keyframes profileIn{from{opacity:0}to{opacity:1}}
+  .profile-dialog{width:min(100%,420px);padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--navy-1);box-shadow:0 24px 80px rgba(0,0,0,.6)}
+  .profile-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+  .profile-dialog h2{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi);line-height:1.1}
+  .profile-dialog p{margin-top:6px;color:var(--text-mut);font-size:13px;line-height:1.5}
+  .profile-close{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--text-mut);cursor:pointer}
+  .profile-close:hover{background:var(--fill);color:var(--text-hi)}
+  .profile-avatar-picker{display:flex;align-items:center;gap:14px;margin:22px 0 20px}
+  .profile-avatar-preview{width:64px;height:64px;border-radius:14px;overflow:hidden;flex:none;background:var(--navy-2);display:grid;place-items:center;color:var(--text-hi);font-size:22px;font-weight:700}
+  .profile-avatar-preview img{width:100%;height:100%;object-fit:cover}
+  .profile-upload-copy{min-width:0}
+  .profile-upload-label{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:0;border-radius:8px;background:var(--fill);color:var(--text-hi);font-size:13px;font-weight:600;cursor:pointer}
+  .profile-upload-label:hover{background:var(--fill-2)}
+  .profile-upload-copy small{display:block;margin-top:6px;color:var(--text-dim);font-size:11px}
+  .profile-upload-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .profile-field{display:flex;flex-direction:column;gap:8px}
+  .profile-field label{color:var(--text-mut);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .profile-input-wrap{display:flex;align-items:center;border:0;border-radius:10px;background:var(--fill);padding:0 13px}
+  .profile-input-wrap span{color:var(--text-dim);font:600 15px var(--mono)}
+  .profile-input{width:100%;height:46px;border:0;outline:0;background:transparent;color:var(--text-hi);font:600 15px var(--mono);min-width:0}
+  .profile-input::placeholder{color:var(--text-dim)}
+  .profile-help{min-height:17px;color:var(--text-dim);font-size:11px}
+  .profile-help.error{color:var(--red)}
+  .profile-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+  .profile-cancel,.profile-save{min-height:38px;padding:0 15px;border-radius:9px;font:600 13px var(--font);cursor:pointer;border:0}
+  .profile-cancel{background:var(--fill);color:var(--text-mut)}
+  .profile-cancel:hover{background:var(--fill-2);color:var(--text-hi)}
+  .profile-save{background:var(--text-hi);color:var(--navy-0)}
+  .profile-save:hover{opacity:.86}
+  .profile-save:disabled{cursor:wait;opacity:.5}
+  .profile-disconnect{width:100%;margin-top:14px;padding-top:14px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--red);font:600 13px var(--font);cursor:pointer;text-align:center}
+  .profile-disconnect:hover{color:#ff7a8f}
+  @media(max-width:768px){.profile-backdrop{align-items:flex-end;padding:12px}.profile-dialog{padding:22px 18px;border-radius:16px}.profile-avatar-picker{margin:20px 0 18px}.profile-actions{padding-top:3px}.profile-cancel,.profile-save{flex:1}}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+    .post{opacity:1}.spark polyline.line{stroke-dashoffset:0}
+  }
+
+  /* ============ VIEW SYSTEM — every secondary view speaks the Home language ============
+     Flat canvas, hairline rhythm, no card chrome. One white primary action, quiet fills for the rest. */
+  :root{--fill:rgba(255,255,255,.06);--fill-2:rgba(255,255,255,.1)}
+  html[data-theme="light"]{--fill:rgba(20,45,80,.06);--fill-2:rgba(20,45,80,.1)}
+  .view-pad{padding:4px 0 24px}
+  .view .card{background:transparent !important;border:0 !important;border-radius:0 !important;padding:0 !important;box-shadow:none !important}
+  .view-label{font-size:13px;font-weight:600;color:var(--text-mut);padding:18px 0 6px}
+
+  /* buttons: one primary, one quiet */
+  .btn-primary-flat,.wallet-actions .wa-primary,.trade-panel button,.row-cta.primary,.launch-card .row-cta,.game-row .row-cta{
+    background:var(--text-hi) !important;color:var(--navy-0) !important;border:0 !important}
+  .wallet-actions .wa-ghost,.row-cta{background:var(--fill) !important;color:var(--text-hi) !important;border:0 !important}
+  .row-cta,.wallet-actions button,.trade-panel button{border-radius:10px;font-weight:600;font-size:13px;transition:opacity .12s var(--ease),transform .12s var(--ease)}
+  .row-cta{padding:8px 16px}
+  .row-cta:hover,.wallet-actions button:hover,.trade-panel button:hover{opacity:.86}
+  .row-cta:active,.wallet-actions button:active,.trade-panel button:active{transform:scale(.97)}
+
+  /* search + chips */
+  .search-box{background:var(--fill) !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;border-radius:12px;padding:12px 14px;margin:8px 0 14px}
+  .search-box svg{color:var(--text-dim)}
+  .chip-row{gap:8px;margin-bottom:8px}
+  .chip{background:var(--fill);border:0;color:var(--text-mut);padding:7px 14px;font-weight:600}
+  .chip:hover{color:var(--text-hi);background:var(--fill-2);border:0}
+  .chip.on{background:var(--text-hi);color:var(--navy-0);border:0}
+
+  /* list rows (search, messages, notifications, leaderboard, assets) */
+  .row-card,.notif-row,.lb-full,.asset-row{padding:14px 0;border-bottom:1px solid var(--line)}
+  .row-card:last-child,.notif-row:last-child,.lb-full:last-child,.asset-row:last-child{border-bottom:1px solid var(--line)}
+  .row-name{font-size:15px;font-weight:600}
+  .row-sub{font-size:13.5px;color:var(--text-mut)}
+  .notif-ico{border-radius:10px;background:var(--fill);color:var(--text-hi)}
+  .notif-row.unread::after{background:var(--text-hi);box-shadow:none}
+  .lb-full .lb-rank{width:18px;font:600 13px var(--mono);color:var(--text-dim)}
+  .lb-full .lb-pts{color:var(--text-mut);font:500 13px var(--mono)}
+  .lb-full:first-child .lb-pts{color:var(--text-hi)}
+
+  /* empty states: copy stacked, action centered beneath */
+  .empty-note{padding:72px 24px;line-height:1.5}
+  .empty-note b{font-size:17px;margin-bottom:6px}
+  .empty-note .empty-action{display:flex !important;margin:18px auto 0 !important;width:max-content;min-height:38px;padding:0 18px;border:0 !important;border-radius:10px;background:var(--text-hi) !important;color:var(--navy-0) !important;font:600 13px var(--font)}
+  .empty-note .empty-action:hover{opacity:.86}
+
+  /* wallet: balance is the hero, no container */
+  .wallet-hero{background:transparent !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;border-radius:0;padding:20px 0 22px;margin:0;border-bottom:1px solid var(--line) !important}
+  .wallet-hero .wl{font-size:13px;font-weight:600;color:var(--text-mut)}
+  .wallet-hero .wv{font:700 40px var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .wallet-hero .wv span{font-size:17px;font-weight:600}
+  .wallet-actions{gap:8px;margin-top:18px}
+  .wallet-actions button{padding:12px 0}
+  .asset-ico{border-radius:10px;background:var(--fill);color:var(--text-hi)}
+
+  /* NFTs: artwork first, metadata as quiet caption */
+  .grid-2{gap:16px 12px}
+  #view-nfts .grid-2{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .nft-tile{background:transparent !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;border-radius:0;cursor:pointer}
+  .nft-img{border-radius:12px;background:url(brand-mark.svg) center/30% no-repeat,linear-gradient(155deg,#1B2C44,#0E1623);transition:transform .2s var(--ease)}
+  .nft-tile:nth-child(2) .nft-img{background:url(brand-mark.svg) center/30% no-repeat,linear-gradient(155deg,#243247,#10151D)}
+  .nft-tile:nth-child(3) .nft-img{background:url(brand-mark.svg) center/30% no-repeat,linear-gradient(155deg,#1A3350,#0B1422)}
+  .nft-tile:nth-child(4) .nft-img{background:url(brand-mark.svg) center/30% no-repeat,linear-gradient(155deg,#2A3140,#12151B)}
+  .nft-tile:hover .nft-img{transform:scale(1.015)}
+  .nft-meta{padding:10px 2px 0}
+  .nft-meta .nm{font-size:14px;font-weight:600}
+  .nft-meta .np{font:500 12.5px var(--mono);color:var(--text-mut);margin-top:3px}
+
+  /* launch: flat rows, white mint, hairline progress */
+  .launch-card{background:transparent !important;border:0 !important;border-bottom:1px solid var(--line) !important;box-shadow:none !important;backdrop-filter:none !important;border-radius:0;padding:18px 0;margin:0}
+  .launch-top .ln{font-size:15px;font-weight:600}
+  .launch-top .lt{font-size:13px}
+  .launch-bar{height:4px;background:var(--fill);margin:16px 0 10px}
+  .launch-bar i{background:var(--text-hi)}
+  .launch-stats{font:500 12.5px var(--mono)}
+
+  /* trade: segmented control + one big input + one action */
+  .trade-panel{background:transparent !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;border-radius:0;padding:18px 0}
+  .trade-pair .tp-name{font-size:17px;font-weight:700}
+  .trade-pair .tp-price{color:var(--green);font:600 15px var(--mono)}
+  .trade-tabs{gap:0;padding:3px;border-radius:12px;background:var(--fill);margin-bottom:14px}
+  .trade-tabs .tt{background:transparent;border-radius:9px;padding:9px;color:var(--text-mut);font-weight:600}
+  .trade-tabs .tt.on{background:var(--text-hi);color:var(--navy-0)}
+  .trade-panel input{background:var(--fill);border:0;border-radius:12px;padding:16px;font:600 20px var(--mono)}
+  .trade-panel input::placeholder{color:var(--text-dim)}
+  .trade-panel button{padding:14px;font-size:14px}
+
+  /* games: app-list rows, like a store shelf */
+  .game-list{display:flex;flex-direction:column}
+  .game-row,.game-row.game-card{display:flex !important;flex-direction:row !important;align-items:center;justify-content:flex-start !important;gap:13px;padding:14px 0 !important;min-height:0 !important;background:transparent !important;border:0 !important;border-bottom:1px solid var(--line) !important;border-radius:0 !important;box-shadow:none !important;backdrop-filter:none !important;text-align:left;cursor:pointer}
+  .game-row .row-txt{flex:1;min-width:0}
+  .game-ico{width:48px;height:48px;border-radius:12px;flex:none;display:grid;place-items:center;font-weight:700;font-size:17px;color:var(--text-hi)}
+  .game-row .gn{font-size:15px;font-weight:600;color:var(--text-hi)}
+  .game-row .gp{font-size:13px;color:var(--text-mut);margin-top:2px;font-weight:400}
+  .game-row .row-cta.soon{background:var(--fill) !important;color:var(--text-mut) !important}
+
+  /* wallet picker sheet: phone browsers have no injected wallet */
+  .wallet-sheet{position:fixed;inset:0;z-index:320;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6)}
+  .wallet-sheet.open{display:flex;animation:profileIn .2s var(--ease)}
+  .ws-panel{width:min(100%,440px);background:var(--navy-1);border-radius:20px 20px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));animation:wsUp .28s var(--ease)}
+  @keyframes wsUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+  .ws-grab{width:36px;height:4px;border-radius:2px;background:var(--fill-2);margin:0 auto 18px}
+  .ws-panel h2{font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
+  .ws-panel p{font-size:13.5px;color:var(--text-mut);margin:6px 0 14px;line-height:1.45}
+  .ws-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);color:var(--text-hi)}
+  .ws-ico{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-weight:700;font-size:16px;color:#fff;flex:none}
+  .ws-name{flex:1;font-size:15px;font-weight:600}
+  .ws-go{width:18px;height:18px;color:var(--text-dim)}
+  .ws-row:active{opacity:.7}
+  .ws-cancel{width:100%;margin-top:14px;padding:13px;border:0;border-radius:12px;background:var(--fill);color:var(--text-hi);font:600 14px var(--font);cursor:pointer}
+  @media(min-width:769px){.wallet-sheet{align-items:center}.ws-panel{border-radius:20px}}
+
+  @media(max-width:768px){
+    #view-nfts .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .wallet-hero .wv{font-size:36px}
+    .empty-note{padding:56px 16px}
+  }
+
+  /* ============ SHARED SYSTEM ALIGNMENT (ui.css owns tokens) ============ */
+  #posts{border-top:1px solid var(--line)}
+  .ay-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-radius:10px;color:inherit;text-decoration:none;
+    transition:background .14s var(--ease)}
+  .ay-row:hover{background:var(--fill)}
+  .ay-row-rank{width:18px;flex:none;text-align:center;font:600 13px var(--mono);color:var(--dim)}
+  .ay-row-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+  .ay-row-name{display:flex;align-items:center;gap:5px;font:600 14.5px var(--sans);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ay-row-sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ay-row-trail{flex:none;font-size:13px;color:var(--muted)}
+  .ay-pts{font:600 13px var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}
+  #view-leaderboard .card,#view-search .card{padding:4px 8px !important}
+  .ay-rail-card{padding:16px 12px;border-bottom:1px solid var(--line)}
+  .ay-rail-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 8px}
+  .ay-rail-head h4{font:700 15px var(--sans);letter-spacing:-.01em;color:var(--ink);text-transform:none}
+  .ay-rail-link{border:0;background:transparent;color:var(--accent-2);font:600 13px var(--sans);cursor:pointer}
+  .ay-rail-link:hover{text-decoration:underline}
+  .ay-rail-copy{padding:0 4px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+  .ay-rail-fine{padding:10px 4px 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+  .ay-rail-empty{padding:10px 4px;font-size:13px;color:var(--muted)}
+  .testnet-notice{margin:12px 16px;align-items:center}
+  .wallet-hero[hidden],.wallet-actions[hidden]{display:none !important}
+  #view-wallet .wallet-actions{max-width:420px}
+  @media(max-width:768px){.testnet-notice{margin:10px 0;font-size:12px;padding:9px 11px}.testnet-notice b{font-size:12px}}
+  .view .ay-empty{padding-top:96px}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+<div class="grid-bg"></div>
+<div class="app">
+  <template id="empty-state-template">
+    <div class="empty-state empty-note" role="status">
+      <b>Nothing here yet</b>
+      This space fills when ArcYard has something useful to show you.
+    </div>
+  </template>
+  <!-- ================= LEFT ================= -->
+  <aside class="rail-left">
+    <a class="brand" href="/" style="text-decoration:none">
+      <div class="brand-mark"><svg class="brand-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ArcYard"><defs><linearGradient id="bmk" x1="18" y1="7" x2="18" y2="33" gradientUnits="userSpaceOnUse"><stop stop-color="#DCE9F2"/><stop offset=".38" stop-color="#A4C0D6"/><stop offset="1" stop-color="#3A6689"/></linearGradient></defs><path d="M8 17A10 10 0 0 1 28 17" stroke="url(#bmk)" stroke-width="2.8" stroke-linecap="round"/><path d="M8 17L18 26M28 17L18 26L18 33" stroke="url(#bmk)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="brand-name">ARCYARD</div>
+    </a>
+
+    <nav class="nav">
+      <div class="nav-item active">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span>Notifications</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg>
+        <span>Wallet</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-3.8A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+        <span>Messages</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l3 6-9 12L3 9Z"/><path d="m3 9h18"/><path d="M12 21 8.5 9 12 3l3.5 6z"/></svg>
+        <span>NFTs</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v4a6 6 0 0 1-12 0Z"/><path d="M6 5H3.5v2A3.5 3.5 0 0 0 6 9M18 5h2.5v2A3.5 3.5 0 0 1 18 9"/><path d="M12 14v3m-3 4h6l-1-4H10Z"/></svg>
+        <span>Leaderboard</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 1.5 6 5 6 9.5 0 2-.7 3.8-1.8 5.2L12 21l-4.2-3.3A8.4 8.4 0 0 1 6 12.5C6 8 8.5 4.5 12 3Z"/><circle cx="12" cy="10.5" r="2"/><path d="M8 18l-2 3M16 18l2 3"/></svg>
+        <span>Launch</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+        <span>Trade</span>
+      </div>
+      <div class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><path d="M7 11v2M6 12h2"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="13.5" r="1"/></svg>
+        <span>Games</span>
+      </div>
+      <div class="nav-item" id="navProfile">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+        <span>Profile</span>
+      </div>
+    </nav>
+
+    <div class="theme-tgl" id="themeTgl">
+      <svg class="ico moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="ico sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+      <span>Appearance</span>
+    </div>
+
+  </aside>
+
+  <!-- ================= CENTER ================= -->
+  <main class="feed">
+    <div class="feed-head" id="feedHead">
+      <div class="feed-title">Home</div>
+      <div class="header-actions">
+        <button class="log-btn" id="logBtn" type="button" aria-label="Activity log" title="Activity log">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+          <span class="log-dot" id="logDot"></span>
+        </button>
+        <button class="btn-login" id="btnLogin" type="button"><span>Connect wallet</span></button>
+      </div>
+    </div>
+    <div class="testnet-notice" role="status" id="testnetNotice"><b>Testnet preview</b><span>Tips and creator keys are paused until the audited contracts ship.</span><button onclick="this.parentElement.style.display='none';try{localStorage.setItem('arcyard-notice-dismissed','1')}catch(e){}" aria-label="Dismiss" style="margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;flex:none">×</button></div>
+    <div class="log-panel" id="logPanel" aria-hidden="true">
+      <div class="log-panel-head">
+        <h4>Activity log</h4>
+        <button class="log-clear" id="logClear" type="button">Clear</button>
+      </div>
+      <div class="log-list" id="logList"><div class="log-empty">Nothing logged yet.</div></div>
+    </div>
+
+    <div id="view-home" class="view active">
+
+    <!-- the only primary action on Home -->
+    <section class="composer" aria-label="Share an update">
+      <div class="composer-top">
+        <div class="avatar av-40" id="composerAvatar" style="background:linear-gradient(135deg,#5C8FB8,#16305A)">A</div>
+        <textarea class="composer-input" aria-label="Write an ArcYard update" placeholder="What's on your mind?"></textarea>
+      </div>
+      <div class="composer-bottom">
+        <svg class="tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
+        <svg class="tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+        <span class="count num">0/840</span>
+        <button class="btn-post" type="button">Post</button>
+      </div>
+    </section>
+
+    <!-- tabs -->
+    <div class="tabs">
+      <div class="tab active" data-scope="top">Discover</div>
+      <div class="tab" data-scope="following">Following</div>
+      <div class="tab" data-scope="latest">Latest</div>
+    </div>
+
+    <!-- skeletons (shown during initial load) -->
+    <div id="skeletons">
+      <div class="post" style="animation:none;opacity:1">
+        <div class="post-head"><div class="skeleton" style="width:44px;height:44px;border-radius:50%"></div>
+          <div style="flex:1"><div class="skeleton" style="width:140px;height:14px;margin-bottom:8px"></div><div class="skeleton" style="width:90px;height:12px"></div></div></div>
+        <div style="padding-left:57px;margin-top:14px"><div class="skeleton" style="width:100%;height:12px;margin-bottom:8px"></div><div class="skeleton" style="width:70%;height:12px"></div>
+          <div class="skeleton" style="width:100%;aspect-ratio:16/10;margin-top:14px;border-radius:16px"></div></div>
+      </div>
+      <div class="post" style="animation:none;opacity:1">
+        <div class="post-head"><div class="skeleton" style="width:44px;height:44px;border-radius:50%"></div>
+          <div style="flex:1"><div class="skeleton" style="width:120px;height:14px;margin-bottom:8px"></div><div class="skeleton" style="width:80px;height:12px"></div></div></div>
+        <div style="padding-left:57px;margin-top:14px"><div class="skeleton" style="width:100%;height:12px;margin-bottom:8px"></div><div class="skeleton" style="width:60%;height:12px"></div></div>
+      </div>
+    </div>
+
+    <!-- real content (revealed after load) -->
+    <div id="posts" class="sk-hidden"></div>
+    </div><!-- /view-home -->
+
+    <!-- PROFILE (own page — same shell as /profile but inside the app) -->
+    <div id="view-profile" class="view view-pad" aria-label="Your profile">
+      <div id="ownProfileContent">
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none"></i><div style="flex:1"><i style="width:55%;height:13px;margin-bottom:10px"></i><i style="width:38%;height:11px"></i></div></div>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div id="view-search" class="view view-pad">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search ArcYard, tokens, people">
+      </div>
+      <div class="chip-row">
+        <div class="chip on">Trending</div><div class="chip">People</div><div class="chip">Tokens</div><div class="chip">Posts</div>
+      </div>
+      <div class="card" style="padding:6px 16px">
+        <div class="row-card"><div class="row-txt"><div class="row-name">#ArcTestnet</div><div class="row-sub">12.4K posts</div></div></div>
+        <div class="row-card"><div class="row-txt"><div class="row-name">#PioneerMint</div><div class="row-sub">8.1K posts</div></div></div>
+        <div class="row-card"><div class="row-txt"><div class="row-name">nova.arc</div><div class="row-sub">@nova · settlement builder</div></div><div class="row-cta primary">Follow</div></div>
+        <div class="row-card"><div class="row-txt"><div class="row-name">$YARD</div><div class="row-sub">ArcYard native token</div></div><div class="row-cta">View</div></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="view-notifications" class="view view-pad">
+      <div class="card" id="notificationsList" style="padding:4px 16px">
+        <div class="empty-note"><b>Connect to see activity</b>Your likes, reposts, follows and tips land here.</div>
+      </div>
+    </div>
+
+    <!-- WALLET -->
+    <div id="view-wallet" class="view view-pad">
+      <div class="wallet-hero">
+        <div class="wl">Native USDC balance</div>
+        <div class="wv" id="walletBalance">0.00 <span>USDC</span></div>
+        <div class="wallet-actions" id="walletActions" hidden>
+          <button class="wa-primary" data-act="deposit" type="button">Get testnet USDC</button>
+          <button class="wa-ghost" data-act="copy" type="button">Copy address</button>
+        </div>
+      </div>
+      <div class="card" id="walletAssets" style="padding:6px 16px">
+        <div class="empty-note"><b>Connect your wallet</b>Arc uses USDC as its native gas token.</div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="view-messages" class="view view-pad">
+      <div class="card" style="padding:6px 16px">
+        <div class="row-card"><div class="avatar av-40" style="background:linear-gradient(135deg,#3A6689,#16305A)">V</div><div class="row-txt"><div class="row-name">valen_arc</div><div class="row-sub">gm, saw your post on settlement rails</div></div></div>
+        <div class="row-card"><div class="avatar av-40" style="background:linear-gradient(135deg,#5C8FB8,#1B3158)">L</div><div class="row-txt"><div class="row-name">Loki</div><div class="row-sub">pioneer mint drops in 2 days</div></div></div>
+        <div class="row-card"><div class="avatar av-40" style="background:linear-gradient(135deg,#16305A,#5C8FB8)">K</div><div class="row-txt"><div class="row-name">Kaia Ito</div><div class="row-sub">sent you 40 YARD</div></div></div>
+      </div>
+    </div>
+
+    <!-- NFTs -->
+    <div id="view-nfts" class="view view-pad">
+      <div class="chip-row"><div class="chip on">All</div><div class="chip">Collected</div><div class="chip">Created</div></div>
+      <div class="grid-2">
+        <div class="nft-tile"><div class="nft-img"></div><div class="nft-meta"><div class="nm">Arc Pioneer #0412</div><div class="np">2.4 ARC</div></div></div>
+        <div class="nft-tile"><div class="nft-img"></div><div class="nft-meta"><div class="nm">Arc Pioneer #1188</div><div class="np">2.1 ARC</div></div></div>
+        <div class="nft-tile"><div class="nft-img"></div><div class="nft-meta"><div class="nm">Yard Founders</div><div class="np">5.0 ARC</div></div></div>
+        <div class="nft-tile"><div class="nft-img"></div><div class="nft-meta"><div class="nm">Genesis Town</div><div class="np">0.8 ARC</div></div></div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div id="view-leaderboard" class="view view-pad">
+      <div class="card" style="padding:6px 16px">
+        <div class="lb-full"><span class="lb-rank">1</span><div class="avatar av-36" style="background:linear-gradient(135deg,#3A6689,#16305A)">V</div><div class="row-txt"><div class="row-name">valen_arc</div></div><div class="lb-pts">18,420 pts</div></div>
+        <div class="lb-full"><span class="lb-rank">2</span><div class="avatar av-36" style="background:linear-gradient(135deg,#5C8FB8,#1B3158)">L</div><div class="row-txt"><div class="row-name">Loki</div></div><div class="lb-pts">15,910 pts</div></div>
+        <div class="lb-full"><span class="lb-rank">3</span><div class="avatar av-36" style="background:linear-gradient(135deg,#16305A,#5C8FB8)">K</div><div class="row-txt"><div class="row-name">Kaia Ito</div></div><div class="lb-pts">14,205 pts</div></div>
+        <div class="lb-full"><span class="lb-rank">4</span><div class="avatar av-36" style="background:linear-gradient(135deg,#5C8FB8,#3A6689)">A</div><div class="row-txt"><div class="row-name">ArcClub</div></div><div class="lb-pts">12,760 pts</div></div>
+        <div class="lb-full"><span class="lb-rank">5</span><div class="avatar av-36" style="background:var(--grad)">Y</div><div class="row-txt"><div class="row-name">ArcYard</div></div><div class="lb-pts">11,040 pts</div></div>
+      </div>
+    </div>
+
+    <!-- LAUNCH -->
+    <div id="view-launch" class="view view-pad">
+      <div class="launch-card">
+        <div class="launch-top"><div><div class="ln">Arc Pioneers Collection</div><div class="lt">by ArcYard</div></div><div class="row-cta" data-act="mint">Mint</div></div>
+        <div class="launch-bar"><i style="width:64%"></i></div>
+        <div class="launch-stats"><span>6,420 / 10,000 minted</span><span>0.4 ARC</span></div>
+      </div>
+      <div class="launch-card">
+        <div class="launch-top"><div><div class="ln">Yard Founders Pass</div><div class="lt">by ArcYard</div></div><div class="row-cta" data-act="mint">Mint</div></div>
+        <div class="launch-bar"><i style="width:22%"></i></div>
+        <div class="launch-stats"><span>440 / 2,000 minted</span><span>1.2 ARC</span></div>
+      </div>
+    </div>
+
+    <!-- TRADE -->
+    <div id="view-trade" class="view view-pad">
+      <div class="trade-panel">
+        <div class="trade-pair"><span class="tp-name">YARD / USDC</span><span class="tp-price">$0.10</span></div>
+        <div class="trade-tabs"><div class="tt on" data-side="buy">Buy</div><div class="tt" data-side="sell">Sell</div></div>
+        <input type="number" placeholder="Amount" id="tradeAmt">
+        <button data-act="trade">Buy YARD</button>
+      </div>
+    </div>
+
+    <!-- GAMES -->
+    <div id="view-games" class="view view-pad">
+      <div class="game-list">
+        <div class="game-row game-card"><div class="game-ico" style="background:linear-gradient(155deg,#2C5A80,#132338)">Y</div><div class="row-txt"><div class="gn">Yard Runner</div><div class="gp">Play to earn YARD</div></div><button class="row-cta" type="button">Play</button></div>
+        <div class="game-row game-card"><div class="game-ico" style="background:linear-gradient(155deg,#3B4A63,#161B26)">A</div><div class="row-txt"><div class="gn">Arc Racer</div><div class="gp">Live tournament</div></div><button class="row-cta" type="button">Play</button></div>
+        <div class="game-row game-card"><div class="game-ico" style="background:linear-gradient(155deg,#1F3B5C,#0E1726)">T</div><div class="row-txt"><div class="gn">Town Builder</div><div class="gp">Coming soon</div></div><button class="row-cta soon" type="button">Soon</button></div>
+        <div class="game-row game-card"><div class="game-ico" style="background:linear-gradient(155deg,#34405A,#12161F)">P</div><div class="row-txt"><div class="gn">Pixel Yard</div><div class="gp">Coming soon</div></div><button class="row-cta soon" type="button">Soon</button></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= RIGHT ================= -->
+  <aside class="rail-right">
+    <section class="ay-rail-card">
+      <div class="ay-rail-head"><h4>Top of the yard</h4><button type="button" class="ay-rail-link" data-open-view="Leaderboard">See all</button></div>
+      <div id="railLeaderboard">
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none"></i><div style="flex:1"><i style="width:60%;height:11px;margin:6px 0 8px"></i><i style="width:40%;height:10px"></i></div></div>
+        <div class="ay-sk"><i style="width:40px;height:40px;flex:none"></i><div style="flex:1"><i style="width:52%;height:11px;margin:6px 0 8px"></i><i style="width:34%;height:10px"></i></div></div>
+      </div>
+    </section>
+    <section class="ay-rail-card">
+      <div class="ay-rail-head"><h4>About ArcYard</h4></div>
+      <p class="ay-rail-copy">The social layer for Arc. Post, reply and build reputation with people building on the stablecoin rail.</p>
+      <p class="ay-rail-fine">Testnet preview. On-chain tips and creator keys open after the audited contracts ship.</p>
+    </section>
+  </aside>
+</div>
+<div class="profile-backdrop" id="profileBackdrop" aria-hidden="true">
+  <section class="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <div class="profile-dialog-head">
+      <div><h2 id="profileTitle">Claim your name</h2><p>Choose how the yard sees you.</p></div>
+      <button class="profile-close" id="profileClose" type="button" aria-label="Close profile editor">×</button>
+    </div>
+    <div class="profile-avatar-picker">
+      <div class="profile-avatar-preview" id="profileAvatarPreview">A</div>
+      <div class="profile-upload-copy">
+        <label class="profile-upload-label" for="profileAvatarInput">Choose photo</label>
+        <input class="profile-upload-input" id="profileAvatarInput" type="file" accept="image/png,image/jpeg,image/webp">
+        <small>PNG, JPEG, or WebP. We make it a compact 256px square.</small>
+      </div>
+    </div>
+    <div class="profile-field">
+      <label for="profileHandleInput">Username</label>
+      <div class="profile-input-wrap"><span>@</span><input class="profile-input" id="profileHandleInput" autocomplete="username" maxlength="24" placeholder="your_name"></div>
+      <div class="profile-help" id="profileHelp">3 to 24 letters, numbers, or underscores.</div>
+    </div>
+    <div class="profile-field" style="margin-top:14px">
+      <label for="profileBioInput">Bio</label>
+      <textarea class="profile-input" id="profileBioInput" maxlength="160" placeholder="A short sentence about yourself" style="height:68px;resize:none;padding-top:10px;line-height:1.45"></textarea>
+    </div>
+    <div class="profile-actions">
+      <button class="profile-cancel" id="profileCancel" type="button">Not now</button>
+      <button class="profile-save" id="profileSave" type="button">Save profile</button>
+    </div>
+    <button class="profile-disconnect" id="profileDisconnect" type="button">Disconnect wallet</button>
+  </section>
+</div>
+<div class="wallet-sheet" id="walletSheet" aria-hidden="true">
+  <section class="ws-panel" role="dialog" aria-modal="true" aria-labelledby="wsTitle">
+    <div class="ws-grab"></div>
+    <h2 id="wsTitle">Open in your wallet</h2>
+    <p>Pick your wallet. ArcYard opens inside it, then tap Connect wallet.</p>
+    <a class="ws-row" data-wallet="metamask" href="#"><span class="ws-ico" style="background:#F6851B">M</span><span class="ws-name">MetaMask</span><svg class="ws-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="ws-row" data-wallet="coinbase" href="#"><span class="ws-ico" style="background:#0052FF">C</span><span class="ws-name">Coinbase Wallet</span><svg class="ws-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="ws-row" data-wallet="trust" href="#"><span class="ws-ico" style="background:#3375BB">T</span><span class="ws-name">Trust Wallet</span><svg class="ws-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <button class="ws-cancel" type="button" data-close>Not now</button>
+  </section>
+</div>
+<div class="wallet-sheet" id="tipSheet" aria-hidden="true">
+  <section class="ws-panel" role="dialog" aria-modal="true" aria-labelledby="tipTitle">
+    <div class="ws-grab"></div>
+    <h2 id="tipTitle">Tip this post</h2>
+    <p>Native USDC, sent directly to <span id="tipRecipient" style="color:var(--text-hi);font:600 13px var(--mono)"></span>. A 2.5% protocol fee applies.</p>
+    <div class="profile-input-wrap" style="margin:16px 0"><input id="tipAmountInput" type="number" min="0" step="0.01" placeholder="0.00" class="profile-input" inputmode="decimal"><span>USDC</span></div>
+    <button class="ws-cancel" id="tipSend" type="button" style="background:var(--text-hi);color:var(--navy-0);margin-bottom:8px">Send tip</button>
+    <button class="ws-cancel" type="button" data-close>Cancel</button>
+  </section>
+</div>
+<div class="wallet-sheet" id="tradeKeysSheet" aria-hidden="true">
+  <section class="ws-panel" role="dialog" aria-modal="true" aria-labelledby="tradeTitle">
+    <div class="ws-grab"></div>
+    <h2 id="tradeTitle">Trade keys</h2>
+    <p>Keys for <span id="tradeCreator" style="color:var(--text-hi);font:600 13px var(--mono)"></span>. Price moves with supply, on-chain, no order book.</p>
+    <div class="trade-tabs" style="margin:14px 0">
+      <div class="tt trade-side-btn on" data-side="buy">Buy</div>
+      <div class="tt trade-side-btn" data-side="sell">Sell</div>
+    </div>
+    <div class="profile-input-wrap" style="margin-bottom:10px"><input id="tradeKeyAmount" type="number" min="1" step="1" value="1" class="profile-input" inputmode="numeric"><span>keys</span></div>
+    <div id="tradeQuote" style="color:var(--text-mut);font-size:13px;margin-bottom:14px">Fetching price…</div>
+    <button class="ws-cancel" id="tradeSend" type="button" style="background:var(--text-hi);color:var(--navy-0);margin-bottom:8px">Buy keys</button>
+    <button class="ws-cancel" type="button" data-close>Cancel</button>
+  </section>
+</div>
+
+<button class="mob-fab" id="mobFab" aria-label="New post" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+</button>
+<script src="ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

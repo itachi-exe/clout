@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0C1E3C"/>
+      <stop offset="1" stop-color="#06112A"/>
+    </linearGradient>
+    <linearGradient id="mk" x1="18" y1="7" x2="18" y2="33" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DCE9F2"/>
+      <stop offset=".38" stop-color="#A4C0D6"/>
+      <stop offset="1" stop-color="#3A6689"/>
+    </linearGradient>
+  </defs>
+  <!-- Background tile -->
+  <rect width="36" height="36" rx="9" fill="url(#bg)"/>
+  <!-- Hairline border -->
+  <rect x=".75" y=".75" width="34.5" height="34.5" rx="8.25" stroke="rgba(163,196,224,.18)" stroke-width="1.5"/>
+  <!-- Arc — the top half-circle, referencing the Arc protocol arch -->
+  <path d="M8 17A10 10 0 0 1 28 17" stroke="url(#mk)" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Y — the arc's endpoints flow directly into the Y arms and stem -->
+  <path d="M8 17L18 26M28 17L18 26L18 33" stroke="url(#mk)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

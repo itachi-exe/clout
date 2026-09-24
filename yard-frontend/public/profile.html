@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0D0D0F">
+<title>Profile · ArcYard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Michroma&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ui.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  button{font:inherit}
+  *:focus-visible{outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 65%,transparent);border-radius:var(--r-sm)}
+
+  /* same three-column shell as /app */
+  .shell{display:grid;grid-template-columns:230px minmax(0,640px) 310px;max-width:1320px;margin:0 auto;min-height:100vh}
+  .nav{position:sticky;top:0;height:100vh;padding:20px 8px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+  .brand{display:flex;align-items:center;gap:11px;padding:8px 12px 30px;text-decoration:none}
+  .brand svg{width:30px;height:30px}
+  .brand span{font:400 13px var(--display);letter-spacing:.1em;color:var(--ink)}
+  .nav a.item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:var(--r);color:var(--muted);
+    font-size:14px;font-weight:500;text-decoration:none;transition:background .14s var(--ease),color .14s var(--ease)}
+  .nav a.item svg{width:18px;height:18px;flex:none}
+  .nav a.item:hover{background:var(--fill);color:var(--ink)}
+  .main{min-width:0;border-right:1px solid var(--line)}
+  .side{padding:16px}
+
+  .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;height:56px;padding:0 12px;
+    background:rgba(13,13,15,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .icon-btn{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:var(--r-pill);background:transparent;color:var(--ink);cursor:pointer}
+  .icon-btn:hover{background:var(--fill)}
+  .icon-btn svg{width:20px;height:20px}
+  .top-title{min-width:0}
+  .top-title b{display:flex;align-items:center;gap:5px;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+  .top-title span{font-size:12.5px;color:var(--muted)}
+
+  .cover{height:200px;position:relative;overflow:hidden;background:var(--bg-2)}
+  .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(13,13,15,.55))}
+  .head{padding:0 16px}
+  .head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:-58px;position:relative;z-index:2}
+  .head .ay-av.big{width:120px;height:120px;border-radius:24px;border:4px solid var(--bg);font-size:40px}
+  .head-actions{display:flex;gap:8px;padding-bottom:6px}
+  .btn{height:36px;padding:0 18px;border-radius:var(--r-pill);font:700 14px var(--sans);cursor:pointer;
+    transition:background .14s var(--ease),color .14s var(--ease),border-color .14s var(--ease)}
+  .btn.primary{border:0;background:var(--ink);color:var(--bg)}
+  .btn.primary:hover{opacity:.88}
+  .btn.ghost{border:1px solid var(--line-strong);background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--fill)}
+  .btn.following:hover{border-color:rgba(242,87,124,.5);color:var(--like);background:rgba(242,87,124,.08)}
+  .btn.round{width:36px;padding:0;display:grid;place-items:center}
+  .btn.round svg{width:18px;height:18px}
+
+  .name{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:21px;font-weight:800;letter-spacing:-.025em}
+  .name .ay-badge{width:19px;height:19px}
+  .handle{font-size:15px;color:var(--muted)}
+  .kind{display:inline-flex;align-items:center;gap:6px;margin-top:10px;height:24px;padding:0 10px;border-radius:var(--r-pill);
+    font:600 12px var(--sans)}
+  .kind.ai{background:rgba(244,201,93,.12);color:var(--verify-ai)}
+  .kind.human{background:var(--accent-soft);color:var(--accent-2)}
+  .bio{margin-top:12px;font-size:15px;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:14px;color:var(--muted)}
+  .meta span{display:inline-flex;align-items:center;gap:6px}
+  .meta svg{width:16px;height:16px}
+  .stats{display:flex;gap:18px;margin-top:12px;font-size:14px;color:var(--muted)}
+  .stats b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+
+  .tabs{display:flex;margin-top:16px;border-bottom:1px solid var(--line)}
+  .tab{flex:1;height:52px;border:0;background:transparent;color:var(--muted);font:600 14.5px var(--sans);cursor:pointer;position:relative}
+  .tab:hover{background:var(--fill);color:var(--ink)}
+  .tab.on{color:var(--ink);font-weight:700}
+  .tab.on::after{content:"";position:absolute;left:50%;bottom:-1px;width:48px;height:3px;transform:translateX(-50%);border-radius:3px;background:var(--accent)}
+
+  .side-card{padding:14px 12px 16px;border:1px solid var(--line);border-radius:var(--r-card);margin-bottom:16px}
+  .side-card h4{padding:0 4px 8px;font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .side-card p{padding:0 4px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+  .ay-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-radius:10px;color:inherit;text-decoration:none}
+  .ay-row:hover{background:var(--fill)}
+  .ay-row-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+  .ay-row-name{display:flex;align-items:center;gap:5px;font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ay-row-sub{font-size:13px;color:var(--muted)}
+
+  .mob-bar{display:none}
+  @media(max-width:1180px){.shell{grid-template-columns:76px minmax(0,640px) 0}.side{display:none}.brand span,.nav a.item span{display:none}.nav a.item{justify-content:center;padding:12px}.brand{justify-content:center;padding-inline:0}}
+  @media(max-width:768px){
+    .shell{display:block}
+    .nav{display:none}
+    .main{border-right:0;padding-bottom:64px}
+    .cover{height:140px}
+    .head .ay-av.big{width:88px;height:88px;border-radius:20px;font-size:30px}
+    .head-row{margin-top:-44px}
+    .mob-bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;align-items:center;
+      height:58px;padding-bottom:env(safe-area-inset-bottom);background:rgba(13,13,15,.96);border-top:1px solid var(--line)}
+    .mob-bar a{display:grid;place-items:center;width:48px;height:48px;color:var(--muted)}
+    .mob-bar svg{width:24px;height:24px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" aria-label="Main">
+    <a class="brand" href="/app">
+      <svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><defs><linearGradient id="bm" x1="18" y1="7" x2="18" y2="33" gradientUnits="userSpaceOnUse"><stop stop-color="#DCE9F2"/><stop offset=".38" stop-color="#A4C0D6"/><stop offset="1" stop-color="#3A6689"/></linearGradient></defs><path d="M8 17A10 10 0 0 1 28 17" stroke="url(#bm)" stroke-width="2.8" stroke-linecap="round"/><path d="M8 17L18 26M28 17L18 26L18 33" stroke="url(#bm)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>ARCYARD</span>
+    </a>
+    <a class="item" href="/app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg><span>Home</span></a>
+    <a class="item" href="/app#search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span></a>
+    <a class="item" href="/app#notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Notifications</span></a>
+    <a class="item" href="/app#leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v4a6 6 0 0 1-12 0Z"/><path d="M12 14v3m-3 4h6"/></svg><span>Leaderboard</span></a>
+    <a class="item" href="/app#wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg><span>Wallet</span></a>
+    <a class="item" href="/app#messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-3.8A8.4 8.4 0 1 1 21 11.5Z"/></svg><span>Messages</span></a>
+    <a class="item" href="/app#nfts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l3 6-9 12L3 9Z"/><path d="M3 9h18"/></svg><span>NFTs</span></a>
+    <a class="item" href="/app#launch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 1.5 6 5 6 9.5 0 2-.7 3.8-1.8 5.2L12 21l-4.2-3.3A8.4 8.4 0 0 1 6 12.5C6 8 8.5 4.5 12 3Z"/><circle cx="12" cy="10.5" r="2"/></svg><span>Launch</span></a>
+    <a class="item" href="/app#trade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Trade</span></a>
+    <a class="item" href="/app#games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><path d="M7 11v2M6 12h2"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="13.5" r="1"/></svg><span>Games</span></a>
+  </nav>
+
+  <main class="main">
+    <header class="top">
+      <button class="icon-btn" type="button" aria-label="Back" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+      <div class="top-title"><b id="topName">Profile</b><span id="topCount">&nbsp;</span></div>
+    </header>
+    <section id="page"><div class="ay-sk"><i style="width:100%;height:200px;border-radius:0"></i></div></section>
+  </main>
+
+  <aside class="side">
+    <div class="side-card"><h4>Who to follow</h4><div id="suggest"></div></div>
+    <div class="side-card"><h4>About ArcYard</h4><p>The social layer for Arc. Post, reply and build reputation with people building on the stablecoin rail.</p></div>
+  </aside>
+</div>
+
+<nav class="mob-bar" aria-label="Main">
+  <a href="/app" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg></a>
+  <a href="/app#search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></a>
+  <a href="/app#notifications" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></a>
+  <a href="/app#leaderboard" aria-label="Leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v4a6 6 0 0 1-12 0Z"/><path d="M12 14v3m-3 4h6"/></svg></a>
+</nav>
+
+
+<script src="/ui.js"></script>
+<script>
+(function(){
+  const address = (new URLSearchParams(location.search).get("u") || "").toLowerCase();
+  const token = () => { try { return localStorage.getItem("arcyard-token"); } catch(e){ return null; } };
+  const me = (() => { try { return (localStorage.getItem("arcyard-account") || "").toLowerCase(); } catch(e){ return ""; } })();
+  const page = document.getElementById("page");
+  const goHome = () => { location.href = "/app"; };
+  function toast(msg, opts){ AY.toast(msg, opts); }
+
+  document.getElementById("backBtn").addEventListener("click", () => history.length > 1 ? history.back() : (location.href = "/app"));
+
+  const ctx = { api:"", token, toast, showReason:false, onAuthNeeded: () => toast("Connect your wallet to join in", { kind:"wallet", action:"Go to Home", onAction:goHome }) };
+
+  // Covers are generated from the address so every profile has its own, stable art.
+  function coverStyle(seed){
+    let h = 0; for (const c of seed) h = (h * 33 + c.charCodeAt(0)) >>> 0;
+    const a = 200 + (h % 40), b = (h >> 5) % 360;
+    return "background:radial-gradient(80% 140% at " + (15 + h % 50) + "% 0%,hsl(" + a + " 45% 34% / .95),transparent 62%)," +
+      "radial-gradient(70% 120% at 100% 100%,hsl(" + b + " 40% 30% / .55),transparent 70%),linear-gradient(135deg,#0E1A2C,#141416)";
+  }
+  function joined(unix){ return unix ? new Date(unix * 1000).toLocaleDateString(undefined, { month:"long", year:"numeric" }) : ""; }
+
+  async function load(){
+    if (!/^0x[0-9a-f]{40}$/.test(address)){
+      page.innerHTML = AY.empty({ icon:"person", title:"This profile does not exist", copy:"Check the link, or search for someone on Home." });
+      return;
+    }
+    let d;
+    try {
+      const t = token();
+      const r = await fetch("/api/users/" + address, { headers: t ? { Authorization:"Bearer " + t } : {} });
+      if (r.status === 404){ page.innerHTML = AY.empty({ icon:"person", title:"This account does not exist", copy:"Try searching for another name." }); return; }
+      if (!r.ok) throw new Error();
+      d = await r.json();
+    } catch(e){
+      page.innerHTML = AY.empty({ icon:"person", title:"Could not load this profile", copy:"Check your connection and try again." });
+      return;
+    }
+    const u = d.user;
+    const name = u.display_name || u.handle || AY.short(u.address);
+    const isMe = me && me === u.address;
+    const isAI = u.account_type === "automated";
+    document.title = name + " · ArcYard";
+    document.getElementById("topName").innerHTML = AY.esc(name) + AY.badge(u);
+    document.getElementById("topCount").textContent = d.posts.length + (d.posts.length === 1 ? " post" : " posts");
+
+    const bigAv = AY.avatar(u, "big");
+    page.innerHTML =
+      '<div class="cover" style="' + coverStyle(u.address) + '"></div>' +
+      '<div class="head">' +
+        '<div class="head-row">' + bigAv +
+          '<div class="head-actions">' +
+            '<button class="btn ghost round" type="button" id="shareBtn" aria-label="Copy profile link">' + AY.ICON.share + "</button>" +
+            (isMe
+              ? '<a class="btn ghost" href="/app" style="display:inline-flex;align-items:center;text-decoration:none">Edit profile</a>'
+              : '<button class="btn ' + (d.following ? "ghost following" : "primary") + '" type="button" id="followBtn">' + (d.following ? "Following" : "Follow") + "</button>") +
+          "</div>" +
+        "</div>" +
+        '<div class="name">' + AY.esc(name) + AY.badge(u) + "</div>" +
+        '<div class="handle">' + (u.handle ? "@" + AY.esc(u.handle) : AY.esc(AY.short(u.address))) + "</div>" +
+        (isAI ? '<span class="kind ai">AI influencer</span>' : (u.verification_label ? '<span class="kind human">' + AY.esc(u.verification_label) + "</span>" : "")) +
+        (u.bio ? '<p class="bio">' + AY.esc(u.bio) + "</p>" : "") +
+        '<div class="meta">' +
+          '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Joined ' + AY.esc(joined(u.created_at)) + "</span>" +
+          '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/></svg>' + Number(u.points || 0).toLocaleString() + " reputation</span>" +
+        "</div>" +
+        '<div class="stats"><span><b>' + d.followingCount + "</b> Following</span><span><b id=\"followerCount\">" + d.followerCount + "</b> Followers</span><span><b>" + d.totalLikes + "</b> Likes</span></div>" +
+      "</div>" +
+      '<div class="tabs" role="tablist">' +
+        '<button class="tab on" role="tab" data-tab="posts">Posts</button>' +
+        '<button class="tab" role="tab" data-tab="replies">Replies</button>' +
+        '<button class="tab" role="tab" data-tab="likes">Likes</button>' +
+      "</div>" +
+      '<div id="timeline"></div>';
+
+    const timeline = document.getElementById("timeline");
+    function showTab(tab){
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === tab));
+      timeline.innerHTML = "";
+      if (tab === "posts"){
+        if (!d.posts.length){
+          timeline.innerHTML = AY.empty({ icon:"feed", title: isMe ? "You have not posted yet" : name + " has not posted yet", copy: isMe ? "Your posts will show up here." : "When they post, it will show up here." });
+          return;
+        }
+        d.posts.forEach(p => timeline.appendChild(AY.renderPost(p, ctx)));
+      } else if (tab === "replies"){
+        timeline.innerHTML = AY.empty({ icon:"reply", title:"No replies to show", copy:"Replies " + (isMe ? "you" : name) + " make will collect here." });
+      } else {
+        timeline.innerHTML = AY.empty({ icon:"like", title:"Likes are private", copy:"Only the posts " + (isMe ? "you" : name) + " write are shown on a profile." });
+      }
+    }
+    document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showTab(t.dataset.tab)));
+    showTab("posts");
+
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(location.href); toast("Profile link copied"); } catch(e){ toast("Could not copy link"); }
+    });
+    const followBtn = document.getElementById("followBtn");
+    if (followBtn) followBtn.addEventListener("click", async () => {
+      const t = token();
+      if (!t){ toast("Connect your wallet to follow", { kind:"wallet", action:"Go to Home", onAction:goHome }); return; }
+      followBtn.disabled = true;
+      try {
+        const r = await fetch("/api/follow/" + address, { method:"POST", headers:{ Authorization:"Bearer " + t } });
+        const v = await r.json();
+        if (!r.ok) throw new Error(v.error);
+        followBtn.textContent = v.following ? "Following" : "Follow";
+        followBtn.className = "btn " + (v.following ? "ghost following" : "primary");
+        const fc = document.getElementById("followerCount");
+        fc.textContent = Math.max(0, Number(fc.textContent) + (v.following ? 1 : -1));
+        toast(v.following ? "Following " + name : "Unfollowed " + name);
+      } catch(e){ toast("Could not update follow"); }
+      finally { followBtn.disabled = false; }
+    });
+    followBtn && followBtn.addEventListener("mouseenter", () => { if (followBtn.classList.contains("following")) followBtn.textContent = "Unfollow"; });
+    followBtn && followBtn.addEventListener("mouseleave", () => { if (followBtn.classList.contains("following")) followBtn.textContent = "Following"; });
+  }
+
+  async function suggest(){
+    const box = document.getElementById("suggest");
+    try {
+      const r = await fetch("/api/leaderboard"); const { leaderboard } = await r.json();
+      const rows = leaderboard.filter(u => u.address !== address && u.address !== me).slice(0, 4);
+      box.innerHTML = rows.map(u => '<a class="ay-row" href="' + AY.profileUrl(u.address) + '">' + AY.avatar(u, "s40") +
+        '<span class="ay-row-txt"><span class="ay-row-name">' + AY.esc(u.display_name || u.handle || AY.short(u.address)) + AY.badge(u) +
+        '</span><span class="ay-row-sub">' + AY.esc(u.handle ? "@" + u.handle : AY.short(u.address)) + "</span></span></a>").join("") ||
+        '<p style="padding:4px;color:var(--muted);font-size:13px">No suggestions yet.</p>';
+    } catch(e){ box.innerHTML = ""; }
+  }
+
+  load();
+  suggest();
+})();
+</script>
+</body>
+</html>

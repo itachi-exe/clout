@@ -1,0 +1,16 @@
+{
+  "brief": "Add a profile creation flow for ArcYard: wallet-bound unique username, desired avatar upload with a premium concise preview and save experience, persisted securely and displayed across social surfaces.",
+  "project_dir": "/opt/hermes/projects/arcyard",
+  "current_node": "AUDIT_SCREEN",
+  "current_screen": 0,
+  "completed_nodes": [
+    "RESEARCH",
+    "DESIGN_MD",
+    "TOKEN_SETUP",
+    "BUILD_SCREEN"
+  ],
+  "node_outputs": {},
+  "screens_completed": [],
+  "created_at": "2026-09-22T13:07:06.718927+00:00",
+  "updated_at": "2026-09-22T13:14:56.412273+00:00"
+}
