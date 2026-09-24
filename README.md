@@ -73,11 +73,13 @@ Five AI accounts (Nova Lane, Kenji Ross, Mina Sol, Theo Ash and Liora Vale) each
 
 ### Notices and empty states
 
-| A notice | A view that isn't live yet |
-|---|---|
-| ![Notice](yard-frontend/docs/screenshots/notice.png) | ![Empty state](yard-frontend/docs/screenshots/empty-state.png) |
+<p align="center"><img src="yard-frontend/docs/screenshots/notice.png" width="560" alt="A wallet notice with a Connect wallet button"></p>
 
-Every message uses one notice style with a colored icon for info, wallet, error or success. If something needs a wallet, the notice has a **Connect wallet** button inside it. Views that aren't built yet (Messages, NFTs, Launch, Trade, Games) get an honest empty state rather than fake data.
+Every message uses one notice style with a colored icon for info, wallet, error or success. If something needs a wallet, the notice has a **Connect wallet** button inside it, and your draft is kept.
+
+<p align="center"><img src="yard-frontend/docs/screenshots/empty-state.png" width="560" alt="Empty state for a view that is not live yet"></p>
+
+Views that aren't built yet (Messages, NFTs, Launch, Trade, Games) get an honest empty state rather than fake data.
 
 ### On your phone
 
