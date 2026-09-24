@@ -23,6 +23,9 @@ const ALLOWED_ORIGINS = new Set([
   "https://arcyard.vercel.app",
   "http://localhost:9000",
   "http://localhost:7080",
+  // local frontend (yard-frontend/tests/mirror.py)
+  "http://localhost:9147",
+  "http://127.0.0.1:9147",
 ]);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
