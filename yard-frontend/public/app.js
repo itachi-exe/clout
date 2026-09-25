@@ -133,71 +133,72 @@
         { 5042002: "https://rpc.testnet.arc.io" }
       );
 
-      // If already have a session reuse it
+      // Already have a persisted session (e.g. returned from MetaMask)
       if (wcProvider.accounts && wcProvider.accounts.length) {
         account = wcProvider.accounts[0].toLowerCase();
-      } else {
-        // Capture the WC URI and deep-link directly into MetaMask on iOS
-        const uriPromise = new Promise(resolve => {
-          wcProvider.once("display_uri", uri => resolve(uri));
+        await ensureArc(wcProvider);
+        setLabel("Sign to verify…");
+        const signedIn = await signIn(wcProvider, account);
+        refreshProfileChrome();
+        btn.classList.add("connected");
+        setIdentityState("ready");
+        logActivity("success", "Wallet connected via WalletConnect: " + short(account));
+        if (signedIn && !signedIn.user?.handle){
+          setTimeout(() => {
+            showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
+            setTimeout(() => { const p = document.getElementById("profileEditBtn"); if (p) p.click(); }, 1800);
+          }, 600);
+        }
+        if (typeof loadFeed === "function") loadFeed();
+        if (typeof loadNotifications === "function") loadNotifications();
+        if (typeof loadWallet === "function") loadWallet();
+        wcProvider.on("disconnect", () => {
+          account = null; sessionToken = null;
+          btn.classList.remove("connected");
+          setLabel("Connect Wallet");
+          setIdentityState("idle");
+          try { localStorage.removeItem("wc_pending"); } catch(e){}
         });
-
-        // Start connect (non-blocking — it emits display_uri then waits)
-        const connectPromise = wcProvider.connect();
-
-        // Get URI then open MetaMask with it
-        const uri = await uriPromise;
-        const mmDeepLink = "metamask://wc?uri=" + encodeURIComponent(uri);
-        window.location.href = mmDeepLink;
-
-        // Wait for MetaMask to return and complete the connection
-        await connectPromise;
-        if (!wcProvider.accounts || !wcProvider.accounts.length) throw new Error("No accounts returned");
-        account = wcProvider.accounts[0].toLowerCase();
+        return;
       }
 
-      await ensureArc(wcProvider);
-      setLabel("Sign to verify…");
-      const signedIn = await signIn(wcProvider, account);
-      refreshProfileChrome();
-      btn.classList.add("connected");
-      setIdentityState("ready");
-      logActivity("success", "Wallet connected via WalletConnect: " + short(account));
+      // No session yet — generate URI and deep link to MetaMask
+      // Mark pending so we know to reconnect when the page resumes
+      try { localStorage.setItem("wc_pending", "1"); } catch(e){}
 
-      if (signedIn && !signedIn.user?.handle){
-        setTimeout(() => {
-          showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
-          setTimeout(() => { const p = document.getElementById("profileEditBtn"); if (p) p.click(); }, 1800);
-        }, 600);
-      }
-
-      if (typeof loadFeed === "function") loadFeed();
-      if (typeof loadNotifications === "function") loadNotifications();
-      if (typeof loadWallet === "function") loadWallet();
-
-      wcProvider.on("accountsChanged", a => {
-        account = a[0]; sessionToken = null;
-        setLabel(a[0] ? short(a[0]) : "Connect Wallet");
-        btn.classList.toggle("connected", !!a[0]);
-        setIdentityState(a[0] ? "ready" : "idle");
+      const uriPromise = new Promise(resolve => {
+        wcProvider.once("display_uri", uri => resolve(uri));
       });
-      wcProvider.on("chainChanged", () => { ensureArc(wcProvider).catch(() => {}); });
-      wcProvider.on("disconnect", () => {
-        account = null; sessionToken = null;
-        btn.classList.remove("connected");
-        setLabel("Connect Wallet");
-        setIdentityState("idle");
-      });
+
+      wcProvider.connect().catch(() => {});
+
+      const uri = await Promise.race([
+        uriPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("URI timeout")), 8000))
+      ]);
+
+      // Deep link into MetaMask with the WC URI
+      window.location.href = "metamask://wc?uri=" + encodeURIComponent(uri);
+
     } catch(e) {
+      try { localStorage.removeItem("wc_pending"); } catch(ex){}
       console.error("WalletConnect error:", e);
       setLabel("Connect Wallet");
-      if (e.message && (e.message.includes("User rejected") || e.message.includes("declined"))) {
-        showToast("Connection cancelled", { kind:"info" });
-      } else {
-        showToast("Could not connect wallet", { kind:"error" });
-      }
+      showToast("Could not connect wallet", { kind:"error" });
     }
   }
+
+  // On page load: if we were mid-WC connection (returned from MetaMask), auto-reconnect
+  (async function resumeWcSession(){
+    try {
+      const pending = localStorage.getItem("wc_pending");
+      if (!pending || !window.__WC) return;
+      localStorage.removeItem("wc_pending");
+      // Give the provider time to load
+      await new Promise(r => setTimeout(r, 800));
+      await connectViaWalletConnect();
+    } catch(e){}
+  })();
 
   async function connect(){
     const eth = window.ethereum;
