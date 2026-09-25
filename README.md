@@ -7,7 +7,7 @@
 **The social layer for Arc.**
 Post, trade post shares, and build reputation on Circle's stablecoin chain.
 
-[**Live →**](https://cloutonarc.fun) &nbsp;·&nbsp; [App](https://cloutonarc.fun/app) &nbsp;·&nbsp; Arc Testnet
+[**Live →**](https://cloutonarc.fun) &nbsp;·&nbsp; [App](https://cloutonarc.fun/app) &nbsp;·&nbsp; Arc Mainnet
 
 </div>
 
@@ -65,7 +65,7 @@ flowchart LR
     U -->|/api/*| V
     V -->|rewrite| API[Express API\n:7080]
     API --> DB[(SQLite)]
-    U -->|wallet, shares, keys| ARC[Arc Testnet]
+    U -->|wallet, shares, keys| ARC[Arc Mainnet]
     IDX[Indexers\nposts + keys + shares] -->|poll events| ARC
     IDX --> DB
     PUB[AI publisher\nevery 2-3h] --> DB
@@ -89,11 +89,11 @@ flowchart LR
 
 **All contracts use pull payments.** Fees are credited to a balance the recipient withdraws themselves. A broken or hostile wallet can never freeze trading for anyone else.
 
-| Contract | Arc Testnet |
+| Contract | Arc Mainnet |
 |---|---|
-| Clout | [`0x8161ceDA8f9c870FF66271Fd50Fb63CdAEbCAb73`](https://explorer.testnet.arc.io/address/0x8161ceDA8f9c870FF66271Fd50Fb63CdAEbCAb73) |
-| CloutPostShares | [`0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B`](https://explorer.testnet.arc.io/address/0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B) |
-| CloutKeys | [`0x15c7C2c5571b675f313C2A87bfF8B708B3562aBF`](https://explorer.testnet.arc.io/address/0x15c7C2c5571b675f313C2A87bfF8B708B3562aBF) |
+| Clout | [`0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05`](https://explorer.arc.io/address/0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05) |
+| CloutPostShares | [`0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80`](https://explorer.arc.io/address/0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80) |
+| CloutKeys | [`0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9`](https://explorer.arc.io/address/0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9) |
 
 ### Backend
 

@@ -211,8 +211,8 @@
   .feed-head.stuck{backdrop-filter:blur(14px);
     background:var(--stuck-bg)}
   .feed-title{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--text-hi)}
-  .testnet-notice{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:11px 13px;border:1px solid rgba(245,158,11,.26);border-radius:10px;background:rgba(245,158,11,.08);color:var(--text-mut);font-size:12.5px;line-height:1.45}
-  .testnet-notice b{color:#ffb685;font-weight:700;white-space:nowrap}
+  .testnet-notice{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:11px 13px;border:1px solid rgba(48,209,88,.26);border-radius:10px;background:rgba(48,209,88,.08);color:var(--text-mut);font-size:12.5px;line-height:1.45}
+  .testnet-notice b{color:#30D158;font-weight:700;white-space:nowrap}
   /* composer */
   .composer{padding:20px 22px 16px;margin-top:6px}
   .composer-top{display:flex;gap:14px}
@@ -1006,6 +1006,11 @@
       <span>Appearance</span>
     </div>
 
+    <a class="theme-tgl" href="https://t.me/itachi_r3birth" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" title="Report a bug">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>Report a bug</span>
+    </a>
+
   </aside>
 
   <!-- ================= CENTER ================= -->
@@ -1020,7 +1025,7 @@
         <button class="btn-login" id="btnLogin" type="button"><span>Connect wallet</span></button>
       </div>
     </div>
-    <div class="testnet-notice" role="status" id="testnetNotice"><b>Testnet preview</b><span>Real funds are not at risk. Contracts are live on Arc Testnet.</span><button onclick="this.parentElement.style.display='none';try{localStorage.setItem('clout-notice-dismissed','1')}catch(e){}" aria-label="Dismiss" style="margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;flex:none">×</button></div>
+    <div class="testnet-notice" role="status" id="testnetNotice"><b>Testnet preview</b><span>Live on Arc Mainnet. Built on Circle.</span><button onclick="this.parentElement.style.display='none';try{localStorage.setItem('clout-notice-dismissed','1')}catch(e){}" aria-label="Dismiss" style="margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;flex:none">×</button></div>
     <div class="log-panel" id="logPanel" aria-hidden="true">
       <div class="log-panel-head">
         <h4>Activity log</h4>

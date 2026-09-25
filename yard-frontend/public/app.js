@@ -7,13 +7,13 @@
     if(l){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme','light');}
     try{localStorage.setItem('clout-theme',l?'dark':'light');}catch(e){}
   });
-  // Arc Testnet params, verified live on-chain (chainId 5042002, EIP-1559, gas token USDC)
+  // Arc Mainnet params (chainId 5042, EIP-1559, gas token USDC)
   const ARC = {
-    chainId: "0x4CEF52", // 5042002
-    chainName: "Arc Testnet",
+    chainId: "0x13B2", // 5042
+    chainName: "Arc",
     nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
-    rpcUrls: ["https://rpc.testnet.arc.io"],
-    blockExplorerUrls: ["https://explorer.testnet.arc.io"]
+    rpcUrls: ["https://rpc.mainnet.arc.io"],
+    blockExplorerUrls: ["https://explorer.arc.io"]
   };
   // Clout contracts are deployed and live on Arc Testnet
   const ONCHAIN_ACTIONS_ENABLED = true;
@@ -589,9 +589,9 @@
       document.getElementById("tradeSupply").textContent = d.supply;
       // Show price after fees
       const { ethers } = await import("https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm");
-      const provider = new ethers.JsonRpcProvider("https://rpc.testnet.arc.io");
+      const provider = new ethers.JsonRpcProvider("https://rpc.mainnet.arc.io");
       const abi = ["function getBuyPriceAfterFee(uint256 postId, uint256 amount) view returns (uint256)"];
-      const shares = new ethers.Contract("0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B", abi, provider);
+      const shares = new ethers.Contract("0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80", abi, provider);
       const buyPrice = await shares.getBuyPriceAfterFee(p.id, 1).catch(() => BigInt(d.lastPrice || "0"));
       document.getElementById("tradeBuyPrice").textContent = fmtUsdc(buyPrice.toString());
       document.getElementById("tradeHeld").textContent = d.heldByViewer || 0;
@@ -638,7 +638,7 @@
     buyBtn.disabled = true; sellBtn.disabled = true;
     try {
       const mkt = await fetch(API + "/api/posts/" + tradePost.id + "/shares" + (account ? "?holder=" + account : "")).then(r => r.json());
-      const SHARES_ADDR = "0xB3f5407c64cd2f1cCA52087fcb582c6D1847D16B";
+      const SHARES_ADDR = "0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80";
       const ABI = isBuy
         ? ["function buyShares(uint256 postId, uint256 amount) payable", "function getBuyPriceAfterFee(uint256 postId, uint256 amount) view returns (uint256)"]
         : ["function sellShares(uint256 postId, uint256 amount)"];

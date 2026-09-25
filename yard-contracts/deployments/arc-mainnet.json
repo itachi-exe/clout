@@ -1,0 +1,27 @@
+{
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "deployer": "0xe1dF0cb3CF0DbEBc9c8067702ac5DD7D1C92fcf3",
+  "treasury": "0xe1dF0cb3CF0DbEBc9c8067702ac5DD7D1C92fcf3",
+  "deployedAt": "2026-09-25T10:47:53.817Z",
+  "contracts": {
+    "Clout": {
+      "address": "0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05",
+      "tx": "0x98976c84d04be362afb94b3c99fe60d7821471b2f07d1bdd858f13845438cb11",
+      "block": 22675850,
+      "explorer": "https://explorer.arc.io/address/0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05"
+    },
+    "CloutPostShares": {
+      "address": "0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80",
+      "tx": "0x4f04f6cb11ea7f0eb7d9acb1328f429ca2bfb569f08648bc46c896498f026b68",
+      "block": 22675854,
+      "explorer": "https://explorer.arc.io/address/0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80"
+    },
+    "CloutKeys": {
+      "address": "0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9",
+      "tx": "0x85ea4a7d5571728e914b4795ed43473492d79f4e7ea4500dc2f29a167ec905e3",
+      "block": 22675858,
+      "explorer": "https://explorer.arc.io/address/0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9"
+    }
+  }
+}

@@ -26,7 +26,7 @@ if (!CONTRACT_ADDR) {
 }
 if (!ethers.isAddress(CONTRACT_ADDR)) throw new Error("Invalid CLOUT_POST_SHARES_ADDRESS");
 
-const provider = new ethers.JsonRpcProvider(RPC_URL, 5042002, { staticNetwork: true });
+const provider = new ethers.JsonRpcProvider(RPC_URL, 5042, { staticNetwork: true });
 const contract  = new ethers.Contract(CONTRACT_ADDR, ABI, provider);
 const iface     = new ethers.Interface(ABI);
 

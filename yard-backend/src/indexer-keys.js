@@ -26,7 +26,7 @@ if (!CONTRACT_ADDRESS) {
 }
 if (!ethers.isAddress(CONTRACT_ADDRESS)) throw new Error("Invalid ARCYARD_KEYS_CONTRACT_ADDRESS");
 
-const provider = new ethers.JsonRpcProvider(RPC_URL, 5042002, { staticNetwork: true });
+const provider = new ethers.JsonRpcProvider(RPC_URL, 5042, { staticNetwork: true });
 const iface = new ethers.Interface(ABI);
 
 function alreadyHandled(log, name) {

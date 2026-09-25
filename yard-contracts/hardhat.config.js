@@ -1,8 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+require("dotenv").config({ path: "./keys/mainnet-deployer.env", override: false });
 
-const DEPLOYER_KEY = process.env.ARCYARD_DEPLOYER_KEY || "0x" + "11".repeat(32); // placeholder, never used unless set
-const MAINNET_DEPLOYER_KEY = process.env.ARCYARD_MAINNET_DEPLOYER_KEY || "0x" + "11".repeat(32); // placeholder, never used unless set
+const DEPLOYER_KEY = process.env.ARCYARD_DEPLOYER_KEY || "0x" + "11".repeat(32);
+const MAINNET_DEPLOYER_KEY = process.env.ARCYARD_MAINNET_DEPLOYER_KEY || "0x" + "11".repeat(32);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
