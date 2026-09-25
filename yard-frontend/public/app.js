@@ -133,15 +133,29 @@
         { 5042002: "https://rpc.testnet.arc.io" }
       );
 
-      // If already connected from a previous session, reuse it
+      // If already have a session reuse it
       if (wcProvider.accounts && wcProvider.accounts.length) {
         account = wcProvider.accounts[0].toLowerCase();
       } else {
-        await wcProvider.connect();
-        const accounts = wcProvider.accounts;
-        if (!accounts || !accounts.length) throw new Error("No accounts returned");
-        account = accounts[0].toLowerCase();
+        // Capture the WC URI and deep-link directly into MetaMask on iOS
+        const uriPromise = new Promise(resolve => {
+          wcProvider.once("display_uri", uri => resolve(uri));
+        });
+
+        // Start connect (non-blocking — it emits display_uri then waits)
+        const connectPromise = wcProvider.connect();
+
+        // Get URI then open MetaMask with it
+        const uri = await uriPromise;
+        const mmDeepLink = "metamask://wc?uri=" + encodeURIComponent(uri);
+        window.location.href = mmDeepLink;
+
+        // Wait for MetaMask to return and complete the connection
+        await connectPromise;
+        if (!wcProvider.accounts || !wcProvider.accounts.length) throw new Error("No accounts returned");
+        account = wcProvider.accounts[0].toLowerCase();
       }
+
       await ensureArc(wcProvider);
       setLabel("Sign to verify…");
       const signedIn = await signIn(wcProvider, account);
@@ -150,7 +164,6 @@
       setIdentityState("ready");
       logActivity("success", "Wallet connected via WalletConnect: " + short(account));
 
-      // Onboarding for new users
       if (signedIn && !signedIn.user?.handle){
         setTimeout(() => {
           showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
@@ -178,7 +191,7 @@
     } catch(e) {
       console.error("WalletConnect error:", e);
       setLabel("Connect Wallet");
-      if (e.message && e.message.includes("User rejected")) {
+      if (e.message && (e.message.includes("User rejected") || e.message.includes("declined"))) {
         showToast("Connection cancelled", { kind:"info" });
       } else {
         showToast("Could not connect wallet", { kind:"error" });
