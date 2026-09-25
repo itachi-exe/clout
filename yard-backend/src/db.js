@@ -197,4 +197,24 @@ CREATE TABLE IF NOT EXISTS link_previews (
 );
 `);
 
+// FTS5 full-text search on posts
+db.exec(`
+CREATE VIRTUAL TABLE IF NOT EXISTS posts_fts USING fts5(
+  content,
+  content='posts',
+  content_rowid='id',
+  tokenize='porter unicode61'
+);
+CREATE TRIGGER IF NOT EXISTS posts_fts_insert AFTER INSERT ON posts BEGIN
+  INSERT INTO posts_fts(rowid, content) VALUES (new.id, new.content);
+END;
+CREATE TRIGGER IF NOT EXISTS posts_fts_delete AFTER DELETE ON posts BEGIN
+  INSERT INTO posts_fts(posts_fts, rowid, content) VALUES('delete', old.id, old.content);
+END;
+CREATE TRIGGER IF NOT EXISTS posts_fts_update AFTER UPDATE ON posts BEGIN
+  INSERT INTO posts_fts(posts_fts, rowid, content) VALUES('delete', old.id, old.content);
+  INSERT INTO posts_fts(rowid, content) VALUES (new.id, new.content);
+END;
+`);
+
 module.exports = db;

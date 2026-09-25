@@ -235,16 +235,34 @@ app.get("/api/search", (req, res) => {
   const q = String(req.query.q || "").trim();
   if (q.length < 2) return res.json({ users: [], posts: [] });
   const like = `%${q.replace(/[%_]/g, "\\$&")}%`;
+
   const users = db.prepare(
     "SELECT address, handle, display_name, bio, avatar_data, account_type, verification_label, points FROM users WHERE handle LIKE ? OR display_name LIKE ? OR address LIKE ? ORDER BY points DESC LIMIT 8"
   ).all(like, like, like);
-  const posts = db.prepare(
-    `SELECT p.*, u.handle, u.display_name, u.account_type, u.verification_label, u.avatar_data,
-       (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comment_count
-     FROM posts p LEFT JOIN users u ON u.address = p.author
-     WHERE p.content LIKE ? OR u.handle LIKE ? OR u.display_name LIKE ?
-     ORDER BY p.created_at DESC LIMIT 12`
-  ).all(like, like, like);
+
+  // Use FTS5 for posts if table exists, fall back to LIKE
+  let posts;
+  try {
+    const ftsQ = q.replace(/['"*]/g, " ").trim() + "*";
+    posts = db.prepare(
+      `SELECT p.*, u.handle, u.display_name, u.account_type, u.verification_label, u.avatar_data,
+         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comment_count
+       FROM posts_fts f
+       JOIN posts p ON p.id = f.rowid
+       LEFT JOIN users u ON u.address = p.author
+       WHERE posts_fts MATCH ?
+       ORDER BY rank LIMIT 12`
+    ).all(ftsQ);
+  } catch(e) {
+    posts = db.prepare(
+      `SELECT p.*, u.handle, u.display_name, u.account_type, u.verification_label, u.avatar_data,
+         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comment_count
+       FROM posts p LEFT JOIN users u ON u.address = p.author
+       WHERE p.content LIKE ? OR u.handle LIKE ? OR u.display_name LIKE ?
+       ORDER BY p.created_at DESC LIMIT 12`
+    ).all(like, like, like);
+  }
+
   res.json({ users, posts: previews.attach(posts) });
 });
 

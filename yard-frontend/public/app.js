@@ -126,24 +126,33 @@
   async function connectViaWalletConnect(){
     try {
       setLabel("Connecting…");
-      if (!window.__MMSDK) { showToast("Wallet SDK not loaded", { kind:"error" }); setLabel("Connect Wallet"); return; }
+      const appkit = window.__AppKit;
+      if (!appkit) { showToast("Wallet modal not loaded", { kind:"error" }); setLabel("Connect Wallet"); return; }
 
-      if (!mmSDK) {
-        mmSDK = new window.__MMSDK({
-          dappMetadata: {
-            name: "Clout",
-            url: "https://cloutonarc.fun",
-            iconUrl: "https://cloutonarc.fun/favicon-32.png",
-          },
+      // Open the AppKit modal — handles QR, MetaMask, all wallets
+      await appkit.open();
+
+      // Wait for a connected address
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error("timeout")), 120000);
+        appkit.subscribeEvents(event => {
+          if (event.data?.event === "CONNECT_SUCCESS") {
+            clearTimeout(timeout);
+            resolve();
+          } else if (event.data?.event === "MODAL_CLOSE" && !appkit.getAddress()) {
+            clearTimeout(timeout);
+            reject(new Error("User rejected"));
+          }
         });
-      }
+      });
 
-      const provider = mmSDK.getProvider();
+      const address = appkit.getAddress();
+      if (!address) throw new Error("No address after connect");
+      account = address.toLowerCase();
+
+      // Get the provider for signing
+      const provider = appkit.getProvider();
       wcProvider = provider;
-
-      const accounts = await provider.request({ method: "eth_requestAccounts" });
-      if (!accounts || !accounts.length) throw new Error("No accounts returned");
-      account = accounts[0].toLowerCase();
 
       await ensureArc(provider);
       setLabel("Sign to verify…");
@@ -164,25 +173,18 @@
       if (typeof loadNotifications === "function") loadNotifications();
       if (typeof loadWallet === "function") loadWallet();
 
-      provider.on("accountsChanged", a => {
-        account = a[0]; sessionToken = null;
-        setLabel(a[0] ? short(a[0]) : "Connect Wallet");
-        btn.classList.toggle("connected", !!a[0]);
-        setIdentityState(a[0] ? "ready" : "idle");
-      });
-      provider.on("chainChanged", () => { ensureArc(provider).catch(() => {}); });
-
     } catch(e) {
-      console.error("MetaMask SDK error:", e);
+      console.error("AppKit error:", e);
       setLabel("Connect Wallet");
-      if (e.code === 4001 || (e.message && e.message.includes("rejected"))) {
+      if (e.message && (e.message.includes("rejected") || e.message.includes("User rejected"))) {
         showToast("Connection cancelled", { kind:"info" });
+      } else if (e.message === "timeout") {
+        showToast("Connection timed out", { kind:"error" });
       } else {
         showToast("Could not connect wallet", { kind:"error" });
       }
     }
   }
-
 
   async function connect(){
     const eth = window.ethereum;
