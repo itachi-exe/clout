@@ -195,7 +195,9 @@ html[data-theme="light"] .ay-post:hover{background:rgba(14,22,36,.02)}
 .ay-toast-close:hover{background:var(--fill);color:var(--ink)}
 .ay-toast-close svg{width:14px;height:14px}
 @media (max-width:768px){
-  .ay-toast{bottom:calc(70px + env(safe-area-inset-bottom));width:calc(100vw - 24px);max-width:none}
+  .ay-toast{bottom:calc(76px + env(safe-area-inset-bottom));width:max-content;max-width:calc(100vw - 32px);font-size:13px;padding:8px 10px 8px 10px;gap:8px}
+  .ay-toast-ico{width:24px;height:24px;border-radius:7px}
+  .ay-toast-ico svg{width:13px;height:13px}
 }
 body.toast-open .mob-fab{opacity:0;pointer-events:none}
 
