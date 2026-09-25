@@ -814,7 +814,19 @@
   const profileBackdrop = document.getElementById("profileBackdrop");
   const profileHandleInput = document.getElementById("profileHandleInput");
   const profileAvatarInput = document.getElementById("profileAvatarInput");
+  // iOS Safari sometimes ignores label[for] on hidden inputs — trigger manually
+  const profileUploadLabel = document.querySelector(".profile-upload-label");
+  if (profileUploadLabel) {
+    profileUploadLabel.addEventListener("click", (e) => {
+      e.preventDefault();
+      profileAvatarInput.click();
+    });
+  }
   const profileAvatarPreview = document.getElementById("profileAvatarPreview");
+  if (profileAvatarPreview) {
+    profileAvatarPreview.style.cursor = "pointer";
+    profileAvatarPreview.addEventListener("click", () => profileAvatarInput.click());
+  }
   const profileHelp = document.getElementById("profileHelp");
   const profileSave = document.getElementById("profileSave");
   let profileAvatarData = null;
