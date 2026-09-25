@@ -177,9 +177,9 @@
     const bare = here.replace(/^https?:\/\//, "");
     const enc = encodeURIComponent(here);
     const links = {
-      metamask: "https://metamask.app.link/dapp/" + bare,
-      coinbase: "https://go.cb-w.com/dapp?cb_url=" + enc,
-      trust: "https://link.trustwallet.com/open_url?coin_id=60&url=" + enc
+      metamask: "metamask://dapp/" + bare,
+      coinbase: "cbwallet://dapp?url=" + enc,
+      trust: "trust://open_url?coin_id=60&url=" + enc
     };
     walletSheet.querySelectorAll("a[data-wallet]").forEach(a => { a.href = links[a.dataset.wallet]; });
     walletSheet.classList.add("open");
