@@ -72,6 +72,14 @@
   .stats{display:flex;gap:18px;margin-top:12px;font-size:14px;color:var(--muted)}
   .stats b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
 
+  /* Arc on-chain stats */
+  .arc-chain-stats{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+  .arc-stat{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;
+    border:1px solid var(--line-2);background:var(--fill);font-size:12px;color:var(--muted)}
+  .arc-stat b{color:var(--ink);font-weight:700;font-family:var(--mono)}
+  .arc-stat-badge{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-2);font-weight:600}
+  .arc-stat-loading{font-size:12px;color:var(--dim);padding:2px 0}
+
   .tabs{display:flex;margin-top:16px;border-bottom:1px solid var(--line)}
   .tab{flex:1;height:52px;border:0;background:transparent;color:var(--muted);font:600 14.5px var(--sans);cursor:pointer;position:relative}
   .tab:hover{background:var(--fill);color:var(--ink)}
@@ -211,6 +219,7 @@
           '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Joined ' + AY.esc(joined(u.created_at)) + "</span>" +
           '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/></svg>' + Number(u.points || 0).toLocaleString() + " reputation</span>" +
         "</div>" +
+        '<div class="arc-chain-stats" id="arcChainStats"><span class="arc-stat-loading">Loading on-chain stats…</span></div>' +
         '<div class="stats"><span><b>' + d.followingCount + "</b> Following</span><span><b id=\"followerCount\">" + d.followerCount + "</b> Followers</span><span><b>" + d.totalLikes + "</b> Likes</span></div>" +
       "</div>" +
       '<div class="tabs" role="tablist">' +
@@ -221,6 +230,56 @@
       '<div id="timeline"></div>';
 
     const timeline = document.getElementById("timeline");
+
+    // Fetch Arc on-chain activity stats
+    loadArcChainStats(u.address);
+
+    function loadArcChainStats(addr) {
+      const el = document.getElementById("arcChainStats");
+      if (!el) return;
+      const EXPLORER = "https://explorer.arc.io"; // mainnet; falls back to testnet
+      const TESTNET  = "https://explorer.testnet.arc.io";
+
+      async function fetchStats(base) {
+        const [counters, info] = await Promise.all([
+          fetch(base + "/api/v2/addresses/" + addr + "/counters", { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null),
+          fetch(base + "/api/v2/addresses/" + addr, { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null)
+        ]);
+        return { counters, info };
+      }
+
+      fetchStats(EXPLORER)
+        .catch(() => fetchStats(TESTNET))
+        .then(({ counters, info }) => {
+          if (!counters && !info) { el.innerHTML = ""; return; }
+          const txCount = parseInt(counters?.transactions_count || 0);
+          const balRaw  = info?.coin_balance || "0";
+          const balUsdc = (parseFloat(balRaw) / 1e18).toFixed(2);
+          const isContract = info?.is_contract;
+
+          const items = [];
+
+          // Builder badge: 10+ txns on Arc
+          if (txCount >= 10) {
+            items.push('<span class="arc-stat arc-stat-badge">⬡ Builder</span>');
+          }
+          // Deployer badge
+          if (isContract || (info?.creator_address_hash)) {
+            items.push('<span class="arc-stat arc-stat-badge">◈ Deployer</span>');
+          }
+          // Tx count
+          if (txCount > 0) {
+            items.push('<span class="arc-stat"><b>' + txCount.toLocaleString() + '</b> Arc txns</span>');
+          }
+          // USDC balance
+          if (parseFloat(balUsdc) > 0) {
+            items.push('<span class="arc-stat"><b>$' + balUsdc + '</b> USDC</span>');
+          }
+
+          el.innerHTML = items.length ? items.join("") : "";
+        })
+        .catch(() => { el.innerHTML = ""; });
+    }
     function showTab(tab){
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === tab));
       timeline.innerHTML = "";

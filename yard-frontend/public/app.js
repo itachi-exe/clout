@@ -1353,6 +1353,35 @@
     document.querySelectorAll(".nav-item").forEach(n => { const s = n.querySelector("span"); if (s && s.textContent.trim() === want) n.click(); });
   });
 
+  // --- Arc on-chain activity stats ---
+  function loadArcStats(address, container) {
+    const MAINNET = "https://explorer.arc.io";
+    const TESTNET = "https://explorer.testnet.arc.io";
+    async function fetchStats(base) {
+      const [counters, info] = await Promise.all([
+        fetch(base + "/api/v2/addresses/" + address + "/counters", { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null),
+        fetch(base + "/api/v2/addresses/" + address, { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null)
+      ]);
+      if (!counters && !info) throw new Error("no data");
+      return { counters, info };
+    }
+    fetchStats(MAINNET).catch(() => fetchStats(TESTNET)).then(({ counters, info }) => {
+      const txCount  = parseInt(counters?.transactions_count || 0);
+      const balUsdc  = (parseFloat(info?.coin_balance || "0") / 1e18).toFixed(2);
+      const items = [];
+      if (txCount >= 10) items.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-2);font-size:11.5px;font-weight:600">⬡ Builder</span>');
+      if (info?.creator_address_hash) items.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-2);font-size:11.5px;font-weight:600">◈ Deployer</span>');
+      if (txCount > 0) items.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);background:var(--fill);color:var(--muted);font-size:11.5px"><b style="color:var(--ink);font-family:var(--mono)">' + txCount.toLocaleString() + '</b> Arc txns</span>');
+      if (parseFloat(balUsdc) > 0) items.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);background:var(--fill);color:var(--muted);font-size:11.5px"><b style="color:var(--ink);font-family:var(--mono)">$' + balUsdc + '</b> USDC</span>');
+      if (items.length) {
+        const div = document.createElement("div");
+        div.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 4px";
+        div.innerHTML = items.join("");
+        container.insertAdjacentElement("afterbegin", div);
+      }
+    }).catch(() => {});
+  }
+
   // --- right rail: live top five, same row component ---
   async function loadRightRailLeaderboard(){
     const panel = document.getElementById("railLeaderboard");
@@ -1422,6 +1451,8 @@
         '</div>';
       box.innerHTML = headerHtml;
       document.getElementById("ownEditBtn")?.addEventListener("click", () => openProfile());
+      // Arc on-chain stats for own profile
+      loadArcStats(account, box);
       // posts
       if (!d.posts.length){
         box.insertAdjacentHTML("beforeend", AY.empty({ icon:"feed", title:"Nothing posted yet", copy:"Your posts will show here once you write something." }));
