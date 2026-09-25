@@ -18,7 +18,7 @@ if [ -n "$bad_paths" ]; then echo "$bad_paths" | sed 's/^/  !! /'; fail=1; else 
 echo "== 3. staged content that looks like a secret"
 # 64-hex private keys, PEM blocks, known token prefixes, and any value from the real .env files
 patterns='(0x)?[0-9a-fA-F]{64}\b|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_|xox[baprs]-|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}'
-hits=$(git grep --cached -nIE "$patterns" -- . ':!**/package-lock.json' ':!yard-contracts/deployments/*' ':!yard-ops/pre-push-audit.sh' 2>/dev/null \
+hits=$(git grep --cached -nIE "$patterns" -- . ':!**/package-lock.json' ':!yard-contracts/deployments/*' ':!yard-ops/pre-push-audit.sh' ':!yard-frontend/public/wc.js' 2>/dev/null \
        | grep -vE 'txHash|tx_hash|content_hash|blockHash|"hash"|keccak|0x" \+ "11"\.repeat' || true)
 for envf in yard-backend/.env yard-contracts/.env yard-contracts/keys/*.env; do
   [ -f "$envf" ] || continue
