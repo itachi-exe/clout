@@ -133,11 +133,15 @@
         { 5042002: "https://rpc.testnet.arc.io" }
       );
 
-      await wcProvider.connect();
-      const accounts = wcProvider.accounts;
-      if (!accounts || !accounts.length) throw new Error("No accounts returned");
-
-      account = accounts[0].toLowerCase();
+      // If already connected from a previous session, reuse it
+      if (wcProvider.accounts && wcProvider.accounts.length) {
+        account = wcProvider.accounts[0].toLowerCase();
+      } else {
+        await wcProvider.connect();
+        const accounts = wcProvider.accounts;
+        if (!accounts || !accounts.length) throw new Error("No accounts returned");
+        account = accounts[0].toLowerCase();
+      }
       await ensureArc(wcProvider);
       setLabel("Sign to verify…");
       const signedIn = await signIn(wcProvider, account);
