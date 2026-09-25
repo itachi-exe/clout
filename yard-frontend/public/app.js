@@ -120,9 +120,75 @@
     return data;
   }
 
+  let wcProvider = null;
+
+  async function connectViaWalletConnect(){
+    try {
+      setLabel("Connecting…");
+      if (!window.__WC) { showToast("WalletConnect not loaded yet", { kind:"error" }); setLabel("Connect Wallet"); return; }
+
+      wcProvider = await window.__WC.create(
+        "595d9bb89f9615e405a41a43f01f07b7",
+        [5042002],
+        { 5042002: "https://rpc.testnet.arc.io" }
+      );
+
+      await wcProvider.connect();
+      const accounts = wcProvider.accounts;
+      if (!accounts || !accounts.length) throw new Error("No accounts returned");
+
+      account = accounts[0].toLowerCase();
+      await ensureArc(wcProvider);
+      setLabel("Sign to verify…");
+      const signedIn = await signIn(wcProvider, account);
+      refreshProfileChrome();
+      btn.classList.add("connected");
+      setIdentityState("ready");
+      logActivity("success", "Wallet connected via WalletConnect: " + short(account));
+
+      // Onboarding for new users
+      if (signedIn && !signedIn.user?.handle){
+        setTimeout(() => {
+          showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
+          setTimeout(() => { const p = document.getElementById("profileEditBtn"); if (p) p.click(); }, 1800);
+        }, 600);
+      }
+
+      if (typeof loadFeed === "function") loadFeed();
+      if (typeof loadNotifications === "function") loadNotifications();
+      if (typeof loadWallet === "function") loadWallet();
+
+      wcProvider.on("accountsChanged", a => {
+        account = a[0]; sessionToken = null;
+        setLabel(a[0] ? short(a[0]) : "Connect Wallet");
+        btn.classList.toggle("connected", !!a[0]);
+        setIdentityState(a[0] ? "ready" : "idle");
+      });
+      wcProvider.on("chainChanged", () => { ensureArc(wcProvider).catch(() => {}); });
+      wcProvider.on("disconnect", () => {
+        account = null; sessionToken = null;
+        btn.classList.remove("connected");
+        setLabel("Connect Wallet");
+        setIdentityState("idle");
+      });
+    } catch(e) {
+      console.error("WalletConnect error:", e);
+      setLabel("Connect Wallet");
+      if (e.message && e.message.includes("User rejected")) {
+        showToast("Connection cancelled", { kind:"info" });
+      } else {
+        showToast("Could not connect wallet", { kind:"error" });
+      }
+    }
+  }
+
   async function connect(){
     const eth = window.ethereum;
-    if (!eth){ openWalletSheet(); return; }
+    if (!eth){
+      // No injected wallet (iOS Safari) — use WalletConnect
+      await connectViaWalletConnect();
+      return;
+    }
     try {
       setLabel("Connecting…");
       const accts = await eth.request({ method: "eth_requestAccounts" });
