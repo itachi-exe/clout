@@ -121,84 +121,68 @@
   }
 
   let wcProvider = null;
+  let mmSDK = null;
 
   async function connectViaWalletConnect(){
     try {
       setLabel("Connecting…");
-      if (!window.__WC) { showToast("WalletConnect not loaded yet", { kind:"error" }); setLabel("Connect Wallet"); return; }
+      if (!window.__MMSDK) { showToast("Wallet SDK not loaded", { kind:"error" }); setLabel("Connect Wallet"); return; }
 
-      wcProvider = await window.__WC.create(
-        "595d9bb89f9615e405a41a43f01f07b7",
-        [5042002],
-        { 5042002: "https://rpc.testnet.arc.io" }
-      );
-
-      // Already have a persisted session (e.g. returned from MetaMask)
-      if (wcProvider.accounts && wcProvider.accounts.length) {
-        account = wcProvider.accounts[0].toLowerCase();
-        await ensureArc(wcProvider);
-        setLabel("Sign to verify…");
-        const signedIn = await signIn(wcProvider, account);
-        refreshProfileChrome();
-        btn.classList.add("connected");
-        setIdentityState("ready");
-        logActivity("success", "Wallet connected via WalletConnect: " + short(account));
-        if (signedIn && !signedIn.user?.handle){
-          setTimeout(() => {
-            showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
-            setTimeout(() => { const p = document.getElementById("profileEditBtn"); if (p) p.click(); }, 1800);
-          }, 600);
-        }
-        if (typeof loadFeed === "function") loadFeed();
-        if (typeof loadNotifications === "function") loadNotifications();
-        if (typeof loadWallet === "function") loadWallet();
-        wcProvider.on("disconnect", () => {
-          account = null; sessionToken = null;
-          btn.classList.remove("connected");
-          setLabel("Connect Wallet");
-          setIdentityState("idle");
-          try { localStorage.removeItem("wc_pending"); } catch(e){}
+      if (!mmSDK) {
+        mmSDK = new window.__MMSDK({
+          dappMetadata: {
+            name: "Clout",
+            url: "https://cloutonarc.fun",
+            iconUrl: "https://cloutonarc.fun/favicon-32.png",
+          },
         });
-        return;
       }
 
-      // No session yet — generate URI and deep link to MetaMask
-      // Mark pending so we know to reconnect when the page resumes
-      try { localStorage.setItem("wc_pending", "1"); } catch(e){}
+      const provider = mmSDK.getProvider();
+      wcProvider = provider;
 
-      const uriPromise = new Promise(resolve => {
-        wcProvider.once("display_uri", uri => resolve(uri));
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      if (!accounts || !accounts.length) throw new Error("No accounts returned");
+      account = accounts[0].toLowerCase();
+
+      await ensureArc(provider);
+      setLabel("Sign to verify…");
+      const signedIn = await signIn(provider, account);
+      refreshProfileChrome();
+      btn.classList.add("connected");
+      setIdentityState("ready");
+      logActivity("success", "Wallet connected: " + short(account));
+
+      if (signedIn && !signedIn.user?.handle){
+        setTimeout(() => {
+          showToast("Welcome to Clout. Set a handle so people can find you.", { kind:"info" });
+          setTimeout(() => { const p = document.getElementById("profileEditBtn"); if (p) p.click(); }, 1800);
+        }, 600);
+      }
+
+      if (typeof loadFeed === "function") loadFeed();
+      if (typeof loadNotifications === "function") loadNotifications();
+      if (typeof loadWallet === "function") loadWallet();
+
+      provider.on("accountsChanged", a => {
+        account = a[0]; sessionToken = null;
+        setLabel(a[0] ? short(a[0]) : "Connect Wallet");
+        btn.classList.toggle("connected", !!a[0]);
+        setIdentityState(a[0] ? "ready" : "idle");
       });
-
-      wcProvider.connect().catch(() => {});
-
-      const uri = await Promise.race([
-        uriPromise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error("URI timeout")), 8000))
-      ]);
-
-      // Deep link into MetaMask with the WC URI
-      window.location.href = "metamask://wc?uri=" + encodeURIComponent(uri);
+      provider.on("chainChanged", () => { ensureArc(provider).catch(() => {}); });
 
     } catch(e) {
-      try { localStorage.removeItem("wc_pending"); } catch(ex){}
-      console.error("WalletConnect error:", e);
+      console.error("MetaMask SDK error:", e);
       setLabel("Connect Wallet");
-      showToast("Could not connect wallet", { kind:"error" });
+      if (e.code === 4001 || (e.message && e.message.includes("rejected"))) {
+        showToast("Connection cancelled", { kind:"info" });
+      } else {
+        showToast("Could not connect wallet", { kind:"error" });
+      }
     }
   }
 
-  // On page load: if we were mid-WC connection (returned from MetaMask), auto-reconnect
-  (async function resumeWcSession(){
-    try {
-      const pending = localStorage.getItem("wc_pending");
-      if (!pending || !window.__WC) return;
-      localStorage.removeItem("wc_pending");
-      // Give the provider time to load
-      await new Promise(r => setTimeout(r, 800));
-      await connectViaWalletConnect();
-    } catch(e){}
-  })();
 
   async function connect(){
     const eth = window.ethereum;
