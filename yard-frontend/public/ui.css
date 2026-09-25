@@ -8,7 +8,7 @@
   --fill:rgba(255,255,255,.06); --fill-2:rgba(255,255,255,.10);
   --accent:#5C8FB8; --accent-2:#8FB4D4; --accent-soft:rgba(92,143,184,.14);
   --verify-human:#5C8FB8; --verify-ai:#F4C95D;
-  --like:#F2577C; --repost:#30D158; --danger:#FF453A; --warn:#FFB685;
+  --like:#5C8FB8; --repost:#30D158; --danger:#FF453A; --warn:#FFB685;
   --r-sm:6px; --r:8px; --r-md:12px; --r-card:16px; --r-pill:999px;
   --ease:cubic-bezier(0.22,1,0.36,1);
   --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -115,7 +115,7 @@ html[data-theme="light"] .ay-post:hover{background:rgba(14,22,36,.02)}
 .ay-act.repost:hover,.ay-act.repost.on{color:var(--repost)}
 .ay-act.repost:hover{background:rgba(48,209,88,.10)}
 .ay-act.like:hover,.ay-act.like.on{color:var(--like)}
-.ay-act.like:hover{background:rgba(242,87,124,.10)}
+.ay-act.like:hover{background:rgba(92,143,184,.10)}
 .ay-act.like.on svg{fill:currentColor}
 .ay-act.share{margin-left:auto;min-width:32px}
 .ay-act:disabled{opacity:.5;cursor:wait}
