@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#020305" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EEF3F8" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<title>Clout · The social layer for Arc</title>
+<meta name="description" content="The social layer for Arc. Post, trade, and build reputation on the fastest settlement rail in crypto.">
+<meta property="og:title" content="Clout · The social layer for Arc">
+<meta property="og:description" content="Post, trade post shares, and build reputation on Arc. The on-chain social layer.">
+<meta property="og:image" content="https://cloutonarc.fun/og-image.png">
+<meta property="og:url" content="https://cloutonarc.fun">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Clout · The social layer for Arc">
+<meta name="twitter:description" content="Post, trade post shares, and build reputation on Arc.">
+<meta name="twitter:image" content="https://cloutonarc.fun/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=Michroma&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<style>
+  :root{
+    --navy-0:#040B1C; --navy-1:#0A1730; --navy-2:#0E1E3D;
+    --steel:#3A6689; --silver:#DEE8EA; --primary:#5C8FB8; --primary-2:#8FB4D4;
+    --text:#C8D6E5; --text-hi:#F3F8FC; --text-mut:#7C93AE;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --display:'Michroma','Inter',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--navy-0);color:var(--text);font-family:var(--font);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  body{min-height:100vh;position:relative}
+  a{color:inherit;text-decoration:none}
+
+  .vignette{position:fixed;inset:0;z-index:3;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 30%,transparent 40%,rgba(2,6,16,.55) 100%)}
+
+
+
+  /* background scene: every moving part is compositor-only (transform / opacity) */
+  .scene{position:fixed;inset:0;z-index:0;overflow:hidden;background:#040B1C;contain:strict}
+  .aurora{position:absolute;inset:-10%}
+  .blob{position:absolute;display:block;border-radius:50%;will-change:transform}
+  .blob.b1{left:0%;top:-8%;width:90vmax;height:90vmax;background:radial-gradient(closest-side,rgba(58,102,137,.55),rgba(58,102,137,0));animation:drift1 38s ease-in-out infinite alternate}
+  .blob.b2{right:-18%;top:-14%;width:80vmax;height:80vmax;background:radial-gradient(closest-side,rgba(92,143,184,.42),rgba(92,143,184,0));animation:drift2 46s ease-in-out infinite alternate}
+  .blob.b3{left:18%;top:10%;width:100vmax;height:100vmax;background:radial-gradient(closest-side,rgba(45,80,120,.5),rgba(45,80,120,0));animation:drift3 54s ease-in-out infinite alternate}
+  @keyframes drift1{to{transform:translate3d(6vw,5vh,0) scale(1.06)}}
+  @keyframes drift2{to{transform:translate3d(-5vw,6vh,0) scale(.95)}}
+  @keyframes drift3{to{transform:translate3d(7vw,-4vh,0) scale(1.04)}}
+  .city{position:absolute;inset:0}
+  .layer{position:absolute;top:0;left:0;will-change:transform}
+  .layer canvas{display:block;width:100%;height:100%}
+  .tw{position:absolute;width:2.6px;height:3.4px;background:rgb(200,226,248);opacity:0;will-change:opacity;
+    animation:twinkle var(--d) ease-in-out var(--delay) infinite}
+  @keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
+  .dust{position:absolute;inset:0;will-change:transform}
+  .mote{position:absolute;bottom:-12px;border-radius:50%;background:rgb(180,214,240);will-change:transform;
+    animation:rise var(--d) linear var(--delay) infinite}
+  @keyframes rise{to{transform:translate3d(var(--sway),calc(-100vh - 24px),0)}}
+  .overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  @media (prefers-reduced-motion:reduce){.blob,.tw,.mote{animation:none}.tw{opacity:.35}}
+
+  /* nav */
+  nav.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;
+    justify-content:space-between;padding:26px clamp(24px,5vw,72px);
+    opacity:0;animation:dropIn 1s var(--ease) .2s forwards}
+  .brand{display:flex;align-items:center;gap:13px}
+  .brand img{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+  .brand span{font-family:var(--display);font-weight:400;letter-spacing:.14em;font-size:16px;color:var(--text-hi)}
+  .nav-links{display:flex;align-items:center;gap:38px}
+  .nav-links a{font-size:15px;font-weight:500;color:var(--text-mut);transition:color .2s}
+  .nav-links a:hover{color:var(--text-hi)}
+  .nav-cta{padding:11px 22px;border-radius:999px;border:1px solid rgba(143,180,212,.3);
+    background:rgba(143,180,212,.06);color:var(--text-hi);font-weight:600;font-size:15px;
+    backdrop-filter:blur(10px);transition:all .25s var(--ease)}
+  .nav-cta:hover{background:rgba(143,180,212,.14);border-color:rgba(143,180,212,.5);transform:translateY(-1px)}
+  @media(max-width:820px){.nav-links a:not(.nav-cta){display:none}}
+
+  /* hero */
+  .hero{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;text-align:center;padding:0 24px;pointer-events:none}
+  .hero > *{pointer-events:auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;
+    border:1px solid rgba(143,180,212,.22);background:rgba(10,23,48,.5);backdrop-filter:blur(10px);
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;color:var(--primary-2);text-transform:uppercase;
+    margin-bottom:34px;opacity:0;animation:riseIn .9s var(--ease) .5s forwards}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:#38E8A0;box-shadow:0 0 12px #38E8A0;
+    animation:pulse 2.4s ease-in-out infinite}
+  .stream-wrap{display:inline-flex;align-items:center;gap:0;color:rgba(255,255,255,.55)}
+  .stream-text{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.55)}
+  .stream-cursor{display:inline-block;width:1.5px;height:12px;background:rgba(255,255,255,.5);
+    margin-left:2px;vertical-align:middle;animation:blink .75s step-end infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  h1{font-family:var(--display);font-size:clamp(30px,5.6vw,76px);line-height:1.08;font-weight:400;letter-spacing:.01em;
+    color:var(--text-hi);max-width:20ch;margin-bottom:28px}
+  h1 .line{display:block;overflow:hidden}
+  h1 .line span{display:block;transform:translateY(105%);
+    animation:lineUp 1.05s var(--ease) forwards}
+  h1 .line:nth-child(1) span{animation-delay:.55s}
+  h1 .line:nth-child(2) span{animation-delay:.68s}
+  h1 .grad{background:linear-gradient(105deg,var(--silver) 0%,var(--primary-2) 45%,var(--steel) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{font-size:clamp(16px,2vw,21px);line-height:1.55;color:var(--text-mut);max-width:56ch;
+    margin-bottom:44px;opacity:0;animation:riseIn 1s var(--ease) 1.05s forwards}
+  .cta-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:16px;
+    opacity:0;animation:riseIn 1s var(--ease) 1.25s forwards}
+  .btn-primary{position:relative;padding:17px 40px;border-radius:999px;border:none;
+    background:linear-gradient(135deg,var(--primary-2),var(--primary) 55%,var(--steel));
+    color:#04101F;font-weight:800;font-size:17px;letter-spacing:.01em;cursor:pointer;overflow:hidden;
+    box-shadow:0 14px 44px -14px rgba(92,143,184,.7),inset 0 1px 0 rgba(255,255,255,.35);
+    transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+  .btn-primary:hover{box-shadow:0 22px 60px -14px rgba(92,143,184,.9),inset 0 1px 0 rgba(255,255,255,.5)}
+  .btn-primary .shine{position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+    transform:skewX(-20deg);animation:shine 4.5s ease-in-out infinite}
+  .btn-ghost{padding:17px 34px;border-radius:999px;border:1px solid rgba(143,180,212,.28);
+    background:rgba(10,23,48,.4);backdrop-filter:blur(10px);color:var(--text-hi);font-weight:600;font-size:17px;
+    cursor:pointer;transition:all .25s var(--ease)}\n  .btn-ghost:hover{background:rgba(143,180,212,.1);border-color:rgba(143,180,212,.5);transform:translateY(-2px)}
+
+  /* stats strip */
+  .stats{position:fixed;bottom:0;left:0;right:0;z-index:15;display:flex;justify-content:center;gap:clamp(30px,7vw,96px);
+    padding:26px 24px calc(26px + env(safe-area-inset-bottom));
+    border-top:1px solid rgba(143,180,212,.1);
+    background:linear-gradient(180deg,transparent,rgba(4,11,28,.72));backdrop-filter:blur(12px);
+    opacity:0;animation:riseIn 1s var(--ease) 1.5s forwards}
+  .stat{text-align:center}
+  .stat .v{font-family:var(--mono);font-size:clamp(20px,2.6vw,30px);font-weight:600;color:var(--text-hi);
+    letter-spacing:-.01em}
+  .stat .l{font-size:12px;color:var(--text-mut);text-transform:uppercase;letter-spacing:.1em;margin-top:5px}
+  @media(max-width:560px){.stat:nth-child(4){display:none}}
+
+  /* scroll hint */
+  .scroll-hint{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:15;
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--text-mut);text-transform:uppercase;
+    opacity:0;animation:riseIn 1s var(--ease) 1.7s forwards}
+
+  @keyframes lineUp{to{transform:translateY(0)}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes dropIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+  @keyframes shine{0%,55%{left:-60%}80%,100%{left:130%}}
+
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:768px){
+    nav.top{padding:16px 20px}
+    .brand{gap:9px}
+    .brand img{width:30px;height:30px}
+    .brand span{font-size:12px;letter-spacing:.1em}
+    .nav-cta{padding:9px 15px;font-size:13px;white-space:nowrap;letter-spacing:.02em}
+    .hero{justify-content:center;padding:100px 22px 170px;min-height:100vh}
+    .eyebrow{font-size:10.5px;padding:7px 13px;margin-bottom:22px}
+    h1{font-size:clamp(28px,8.5vw,40px);line-height:1.12;letter-spacing:0;max-width:100%;margin-bottom:20px;
+      text-shadow:0 2px 24px rgba(4,11,28,.85)}
+    .sub{font-size:15px;line-height:1.5;max-width:100%;margin-bottom:32px;
+      text-shadow:0 1px 16px rgba(4,11,28,.9)}
+    .cta-row{width:100%;flex-direction:column;gap:12px}
+    .btn-primary,.btn-ghost{width:100%;text-align:center;padding:16px 24px;font-size:16px}
+    .scroll-hint{display:none}
+    .stats{gap:0;justify-content:space-around;padding:18px 12px calc(18px + env(safe-area-inset-bottom))}
+    .stat .v{font-size:19px}
+    .stat .l{font-size:10px;letter-spacing:.06em;margin-top:3px}
+  }
+  @media(max-width:360px){
+    h1{font-size:26px}
+    .sub{font-size:14px}
+    .stat .v{font-size:17px}
+    .stat .l{font-size:9px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="aurora"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
+    <div class="city" id="city"></div>
+    <div class="dust" id="dust"></div>
+    <canvas class="overlay" id="overlay"></canvas>
+  </div>
+
+  <nav class="top">
+    <a class="brand" href="/">
+      <img src="brand-mark.svg" alt="Clout">
+      <span>CLOUT</span>
+    </a>
+    <div class="nav-links">
+      <a href="/app">Feed</a>
+      <a href="/app#search">People</a>
+      <a href="/app#leaderboard">Leaderboard</a>
+      <a href="/docs" class="nav-cta">Docs</a>
+      <a href="/app" class="nav-cta" style="background:var(--primary);color:#fff;border-color:var(--primary)">Open Clout</a>
+    </div>
+  </nav>
+
+  <main class="hero">
+    <div class="eyebrow"><span class="stream-wrap"><span class="stream-text" id="streamText"></span><span class="stream-cursor"></span></span></div>
+    <h1>
+      <div class="line"><span>The social layer</span></div>
+      <div class="line"><span class="grad">for Arc.</span></div>
+    </h1>
+    <p class="sub">Reputation is priced, not gamed. Post, trade shares of content you believe in, and build a verifiable on-chain identity on Arc.</p>
+    <div class="cta-row">
+      <a class="btn-primary" href="/app" data-hot>Enter Clout<span class="shine"></span></a>
+    </div>
+  </main>
+
+  <div class="stats">
+    <div class="stat"><div class="v">USDC</div><div class="l">Native gas</div></div>
+    <div class="stat"><div class="v">&lt;1s</div><div class="l">Finality</div></div>
+    <div class="stat"><div class="v">EVM</div><div class="l">Compatible</div></div>
+    
+    
+  </div>
+
+<script>
+(function(){
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const DPR = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2);
+  const city = document.getElementById('city');
+  const dustEl = document.getElementById('dust');
+  const oc = document.getElementById('overlay'), ox = oc.getContext('2d');
+
+  const LAYER_DEFS = [
+    { depth:0.020, color:'#0A1730', count:14, minH:.18, maxH:.42, glow:.10 },
+    { depth:0.045, color:'#0E1E3D', count:11, minH:.28, maxH:.62, glow:.16 },
+    { depth:0.085, color:'#122A52', count:8,  minH:.42, maxH:.86, glow:.26 }
+  ];
+  let W = innerWidth, H = innerHeight, layers = [];
+
+  function shade(hex, f){
+    const n = parseInt(hex.slice(1), 16);
+    return 'rgb(' + (Math.min(255, ((n>>16)&255)*f)|0) + ',' + (Math.min(255, ((n>>8)&255)*f)|0) + ',' + (Math.min(255, (n&255)*f)|0) + ')';
+  }
+  function roundTop(c, x, y, w, h, r){
+    c.beginPath(); c.moveTo(x, y + h); c.lineTo(x, y + r); c.arcTo(x, y, x + r, y, r);
+    c.lineTo(x + w - r, y); c.arcTo(x + w, y, x + w, y + r, r); c.lineTo(x + w, y + h); c.closePath();
+  }
+
+  // Each skyline layer is painted ONCE. Parallax later is only a CSS transform on its wrapper.
+  function buildCity(){
+    city.textContent = ''; layers = [];
+    const baseY = H * 1.02;
+    let twinkleBudget = coarse ? 36 : 64;
+    LAYER_DEFS.forEach((d, li) => {
+      const margin = Math.ceil(W / 2 * d.depth) + 8;
+      const cw = W + margin * 2;
+      const wrap = document.createElement('div');
+      wrap.className = 'layer';
+      wrap.style.cssText = 'width:' + cw + 'px;height:' + H + 'px;left:' + (-margin) + 'px';
+      const cv = document.createElement('canvas');
+      cv.width = Math.ceil(cw * DPR); cv.height = Math.ceil(H * DPR);
+      const c = cv.getContext('2d'); c.scale(DPR, DPR);
+      const g = c.createLinearGradient(0, baseY - H * d.maxH, 0, baseY);
+      g.addColorStop(0, shade(d.color, 1.5 + d.glow)); g.addColorStop(0.5, d.color); g.addColorStop(1, shade(d.color, 0.6));
+      const edge = 'rgba(143,180,212,' + (0.12 + d.glow) + ')', roofFill = shade(d.color, 1.3 + d.glow);
+      const avg = W / d.count, frag = document.createDocumentFragment();
+      let x = -40;
+      while (x < cw){
+        const w = avg * (0.55 + Math.random() * 0.7), h = H * (d.minH + Math.random() * (d.maxH - d.minH)), y = baseY - h;
+        c.fillStyle = g; roundTop(c, x, y, w, h, 4); c.fill();
+        c.fillStyle = edge; c.fillRect(x, y, w, 1.5);
+        if (Math.random() < .35){
+          c.beginPath(); c.moveTo(x - 2, y); c.lineTo(x + w/2, y - Math.min(w * 0.35, 26)); c.lineTo(x + w + 2, y); c.closePath();
+          c.fillStyle = roofFill; c.fill();
+        }
+        if (Math.random() < .28){
+          const sh = h * (0.1 + Math.random() * 0.22);
+          c.strokeStyle = 'rgba(143,180,212,' + (0.3 + d.glow) + ')'; c.lineWidth = 1.4;
+          c.beginPath(); c.moveTo(x + w/2, y); c.lineTo(x + w/2, y - sh); c.stroke();
+          c.fillStyle = '#8FB4D4'; c.beginPath(); c.arc(x + w/2, y - sh, 1.8, 0, 7); c.fill();
+        }
+        if (li >= 1){
+          const cols = Math.max(2, Math.floor(w / 13)), rows = Math.max(2, Math.floor(h / 18));
+          const gx = w / (cols + 1), gy = h / (rows + 1);
+          for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++){
+            const on = Math.random();
+            if (on >= 0.5 + d.glow) continue;
+            const bright = on < 0.16, wx = x + gx * (k + 1) - 1.3, wy = y + gy * (r + 1) - 1.8;
+            c.fillStyle = 'rgba(' + (bright ? '180,214,240' : '120,160,205') + ',' + ((0.08 + 0.22 * d.glow) * (bright ? 1.4 : 0.7)) + ')';
+            c.fillRect(wx, wy, 2.6, 3.4);
+            if (bright && twinkleBudget > 0 && Math.random() < 0.3){
+              twinkleBudget--;
+              const t = document.createElement('i'); t.className = 'tw';
+              t.style.cssText = 'left:' + wx + 'px;top:' + wy + 'px;--d:' + (3 + Math.random() * 5).toFixed(2) + 's;--delay:-' + (Math.random() * 8).toFixed(2) + 's';
+              frag.appendChild(t);
+            }
+          }
+        }
+        x += w + avg * (0.12 + Math.random() * 0.22);
+      }
+      wrap.appendChild(cv); wrap.appendChild(frag);
+      city.appendChild(wrap);
+      layers.push({ el: wrap, depth: d.depth });
+    });
+  }
+
+  function buildDust(){
+    dustEl.textContent = '';
+    const n = Math.min(coarse ? 26 : 48, Math.floor(W / 26)), frag = document.createDocumentFragment();
+    for (let i = 0; i < n; i++){
+      const m = document.createElement('i'), r = Math.random() * 1.6 + .4, dur = 18 + Math.random() * 30;
+      m.className = 'mote';
+      m.style.cssText = 'left:' + (Math.random() * 100).toFixed(2) + '%;width:' + (r * 2).toFixed(1) + 'px;height:' + (r * 2).toFixed(1) + 'px;opacity:' +
+        (Math.random() * 0.4 + 0.08).toFixed(2) + ';--d:' + dur.toFixed(1) + 's;--delay:-' + (Math.random() * dur).toFixed(1) + 's;--sway:' + ((Math.random() - .5) * 60).toFixed(0) + 'px';
+      frag.appendChild(m);
+    }
+    dustEl.appendChild(frag);
+  }
+
+  // Vignette + grain: painted once per resize, normal blending, never touched per frame.
+  const grainTile = document.createElement('canvas');
+  (function(){
+    grainTile.width = grainTile.height = 128;
+    const c = grainTile.getContext('2d'), img = c.createImageData(128, 128), d = img.data;
+    for (let i = 0; i < d.length; i += 4){ const v = Math.random() * 255; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 10; }
+    c.putImageData(img, 0, 0);
+  })();
+  function buildOverlay(){
+    oc.width = Math.ceil(W * DPR); oc.height = Math.ceil(H * DPR);
+    ox.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const v = ox.createRadialGradient(W * .5, H * .3, Math.min(W, H) * .35, W * .5, H * .3, Math.max(W, H) * 1.05);
+    v.addColorStop(0, 'rgba(2,6,16,0)'); v.addColorStop(1, 'rgba(2,6,16,.55)');
+    ox.fillStyle = v; ox.fillRect(0, 0, W, H);
+    ox.fillStyle = ox.createPattern(grainTile, 'repeat'); ox.fillRect(0, 0, W, H);
+  }
+
+  function build(){ W = innerWidth; H = innerHeight; buildCity(); buildDust(); buildOverlay(); applyParallax(); }
+
+  // Parallax: only runs while the pointer is easing toward its target, then stops.
+  const mouse = { x: W/2, y: H/2, tx: W/2, ty: H/2 };
+  let raf = 0;
+  function applyParallax(){
+    for (const L of layers){
+      L.el.style.transform = 'translate3d(' + ((mouse.x - W/2) * -L.depth).toFixed(2) + 'px,' + ((mouse.y - H/2) * -L.depth * 0.35).toFixed(2) + 'px,0)';
+    }
+    dustEl.style.transform = 'translate3d(' + ((mouse.x - W/2) * -0.06).toFixed(2) + 'px,0,0)';
+  }
+  function ease(){
+    mouse.x += (mouse.tx - mouse.x) * 0.08; mouse.y += (mouse.ty - mouse.y) * 0.08;
+    applyParallax();
+    raf = (Math.abs(mouse.tx - mouse.x) + Math.abs(mouse.ty - mouse.y) > 0.3) ? requestAnimationFrame(ease) : 0;
+  }
+  if (!coarse && !reduceMotion){
+    addEventListener('mousemove', e => { mouse.tx = e.clientX; mouse.ty = e.clientY; if (!raf) raf = requestAnimationFrame(ease); }, { passive: true });
+  }
+  let rt, lastW = W;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    // mobile browsers resize on every URL-bar show/hide; only rebuild when the width changes
+    rt = setTimeout(() => { if (innerWidth !== lastW || !coarse){ lastW = innerWidth; build(); } }, 150);
+  });
+
+  /* magnetic primary button, pointer-capable devices only */
+  const mag = document.querySelector('.btn-primary');
+  if (mag && !coarse){
+    const reset = () => { mag.style.transform = ''; };
+    mag.addEventListener('mousemove', e => {
+      const r = mag.getBoundingClientRect();
+      mag.style.transform = 'translate(' + (e.clientX - (r.left + r.width/2)) * 0.28 + 'px,' + (e.clientY - (r.top + r.height/2)) * 0.4 + 'px)';
+    });
+    ['mouseleave', 'mouseup', 'blur'].forEach(ev => mag.addEventListener(ev, reset));
+    window.addEventListener('blur', reset);
+  }
+
+  build();
+})();
+
+// ── Stream text: explains how users use Clout ──
+(function(){
+  const el = document.getElementById('streamText');
+  if (!el) return;
+
+  const phrases = [
+    'post on Arc.',
+    'build reputation.',
+    'follow builders.',
+    'trade creator keys.',
+    'earn points on every like.',
+    'tip posts with USDC.',
+    'mint Arc collections.',
+    'grow your following.',
+    'reply to on-chain activity.',
+    'own your social graph.',
+  ];
+
+  let pi = 0, ci = 0, deleting = false, pauseTimer = null;
+  const TYPE_MS = 46, DELETE_MS = 28, PAUSE_MS = 2200, PAUSE_START_MS = 600;
+
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      ci++;
+      el.textContent = phrase.slice(0, ci);
+      if (ci === phrase.length) {
+        deleting = true;
+        pauseTimer = setTimeout(tick, PAUSE_MS);
+        return;
+      }
+      setTimeout(tick, TYPE_MS);
+    } else {
+      ci--;
+      el.textContent = phrase.slice(0, ci);
+      if (ci === 0) {
+        deleting = false;
+        pi = (pi + 1) % phrases.length;
+        setTimeout(tick, PAUSE_START_MS);
+        return;
+      }
+      setTimeout(tick, DELETE_MS);
+    }
+  }
+
+  // start after eyebrow animates in
+  setTimeout(tick, 1400);
+})();
+</script>
+</body>
+</html>

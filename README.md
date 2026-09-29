@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="yard-frontend/public/brand-mark.svg" width="64" alt="Clout logo">
+<img src="clout-frontend/public/brand-mark.svg" width="64" alt="Clout logo">
 
 # Clout
 
@@ -74,10 +74,10 @@ flowchart LR
 
 | Folder | What it is | Stack |
 |---|---|---|
-| `yard-frontend/` | Landing page, app, profile | Plain HTML, CSS, JS. Hosted on Vercel |
-| `yard-backend/` | API, DB, indexers, AI publisher | Node, Express, better-sqlite3, ethers |
-| `yard-contracts/` | On-chain layer | Solidity 0.8.24, Hardhat |
-| `yard-ops/` | Maintenance and safety scripts | Bash, Python |
+| `clout-frontend/` | Landing page, app, profile | Plain HTML, CSS, JS. Hosted on Vercel |
+| `clout-backend/` | API, DB, indexers, AI publisher | Node, Express, better-sqlite3, ethers |
+| `clout-contracts/` | On-chain layer | Solidity 0.8.24, Hardhat |
+| `clout-ops/` | Maintenance and safety scripts | Bash, Python |
 
 ### Contracts
 
@@ -116,32 +116,32 @@ flowchart LR
 **Requires** Node 20+, an Arc wallet, and testnet USDC from [faucet.circle.com](https://faucet.circle.com/).
 
 ```bash
-git clone https://github.com/itachi-exe/arcyard.git && cd arcyard
+git clone https://github.com/itachi-exe/clout.git && cd clout
 
 # Backend
-cd yard-backend
-cp .env.example .env          # set ARCYARD_JWT_SECRET: openssl rand -hex 32
+cd clout-backend
+cp .env.example .env          # set CLOUT_JWT_SECRET: openssl rand -hex 32
 npm install && npm test
 node src/server.js             # API on :7080
 
 # Frontend (new terminal, repo root)
-python3 yard-frontend/tests/mirror.py
+python3 clout-frontend/tests/mirror.py
 # open http://localhost:9147/app
 ```
 
 Production (pm2):
 ```bash
-sudo pm2 start yard-backend/ecosystem.config.js && sudo pm2 save
+sudo pm2 start clout-backend/ecosystem.config.js && sudo pm2 save
 ```
 
 Contracts:
 ```bash
-cd yard-contracts && npm install
+cd clout-contracts && npm install
 npx hardhat test
 npx hardhat run scripts/deploy-clout-arc-testnet.js --network arcTestnet
 ```
 
-Frontend: `cd yard-frontend && vercel --prod`
+Frontend: `cd clout-frontend && vercel --prod`
 
 ---
 
@@ -152,7 +152,7 @@ Frontend: `cd yard-frontend && vercel --prod`
 | Backend tests | 24: ranking, viewer state, profile validation, rate limits, link preview, SSRF blocking |
 | Contract tests | 28: both contracts including hostile-receiver tests |
 | SSRF protection | 10 live attack cases (loopback, metadata, private LAN, own port, IPv6, decimal IPs) all refused |
-| Secrets | `.env`, keys, DB and backups are gitignored. `yard-ops/pre-push-audit.sh` checks staged files before every push |
+| Secrets | `.env`, keys, DB and backups are gitignored. `clout-ops/pre-push-audit.sh` checks staged files before every push |
 
 ---
 

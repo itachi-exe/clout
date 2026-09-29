@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clout Docs · The social layer for Arc</title>
+<meta name="description" content="Everything you need to know about Clout — the first social app on Arc Mainnet.">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<style>
+  :root{
+    --bg:#07080a; --bg-1:#0e0f12; --bg-2:#141416;
+    --ink:#f5f5f3; --ink-2:#c7c8c4; --muted:#8a8a8e; --dim:#5a5a5e;
+    --accent:#5C8FB8; --accent-soft:rgba(92,143,184,.12);
+    --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.12);
+    --sans:'Inter',system-ui,sans-serif; --mono:'IBM Plex Mono',monospace;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .top{position:sticky;top:0;z-index:100;background:rgba(7,8,10,.9);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;
+    padding:0 32px;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.03em;color:var(--ink)}
+  .top-links{display:flex;gap:24px;font-size:14px;font-weight:500;color:var(--muted)}
+  .top-links a{color:var(--muted)}
+  .top-links a:hover{color:var(--ink);text-decoration:none}
+  .cta-sm{padding:8px 18px;border-radius:999px;background:var(--accent);color:#fff;font-weight:600;font-size:13px}
+  .cta-sm:hover{opacity:.9;text-decoration:none}
+
+  .layout{display:grid;grid-template-columns:240px 1fr;max-width:1100px;margin:0 auto;padding:48px 32px;gap:64px}
+  @media(max-width:768px){.layout{grid-template-columns:1fr;gap:32px}.sidebar{display:none}}
+
+  .sidebar{position:sticky;top:80px;height:fit-content}
+  .sidebar nav{display:flex;flex-direction:column;gap:2px}
+  .sidebar a{font-size:13.5px;color:var(--muted);padding:5px 10px;border-radius:6px;transition:color .15s,background .15s}
+  .sidebar a:hover{color:var(--ink);background:var(--accent-soft);text-decoration:none}
+  .sidebar a.active{color:var(--accent);font-weight:600}
+  .sidebar-section{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+    padding:14px 10px 4px;margin-top:8px}
+
+  .content{max-width:700px}
+  .content h1{font-size:36px;font-weight:800;letter-spacing:-.04em;margin-bottom:12px}
+  .content h2{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:48px 0 14px;padding-top:48px;
+    border-top:1px solid var(--line);color:var(--ink)}
+  .content h2:first-of-type{border-top:none;padding-top:0;margin-top:32px}
+  .content h3{font-size:16px;font-weight:700;margin:28px 0 8px;color:var(--ink-2)}
+  .content p{font-size:15px;line-height:1.7;color:var(--ink-2);margin-bottom:14px}
+  .content ul,.content ol{padding-left:22px;margin-bottom:14px}
+  .content li{font-size:15px;line-height:1.7;color:var(--ink-2);margin-bottom:4px}
+  .content code{font-family:var(--mono);font-size:13px;background:var(--bg-2);padding:2px 6px;border-radius:4px;color:var(--accent)}
+  .content pre{background:var(--bg-1);border:1px solid var(--line-2);border-radius:10px;padding:18px;margin:16px 0;overflow-x:auto}
+  .content pre code{background:none;padding:0;color:var(--ink-2)}
+  .lead{font-size:17px;line-height:1.65;color:var(--muted);margin-bottom:32px}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
+    font-size:12px;font-weight:600;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+  .contract-table{width:100%;border-collapse:collapse;margin:16px 0}
+  .contract-table th{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--dim);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-2)}
+  .contract-table td{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--line);color:var(--ink-2);font-family:var(--mono)}
+  .contract-table td:first-child{font-family:var(--sans);font-weight:600;color:var(--ink);font-size:14px}
+  .contract-table a{color:var(--accent);font-size:12px}
+
+  .callout{background:var(--accent-soft);border:1px solid rgba(92,143,184,.25);border-radius:10px;
+    padding:14px 18px;margin:20px 0;font-size:14px;color:var(--ink-2);line-height:1.6}
+  .callout b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="brand" href="/">
+    <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#3A6689"/><stop offset="1" stop-color="#1E3D5C"/>
+      </linearGradient></defs>
+      <rect width="64" height="64" rx="14" fill="url(#g)"/>
+      <path d="M43 21C39.8 18.2 35.9 16.5 31.5 16.5C22 16.5 14.5 23.5 14.5 32C14.5 40.5 22 47.5 31.5 47.5C35.9 47.5 39.8 45.8 43 43" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <circle cx="45.5" cy="32" r="3.5" fill="white"/>
+    </svg>
+    Clout
+  </a>
+  <div class="top-links">
+    <a href="/">Home</a>
+    <a href="/docs">Docs</a>
+    <a href="https://github.com/itachi-exe/clout" target="_blank">GitHub</a>
+    <a href="/app" class="cta-sm">Open app</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <nav>
+      <div class="sidebar-section">Overview</div>
+      <a href="#what-is-clout">What is Clout?</a>
+      <a href="#why-clout">Why Clout?</a>
+      <a href="#getting-started">Getting started</a>
+
+      <div class="sidebar-section">Features</div>
+      <a href="#feed">Feed</a>
+      <a href="#post-shares">Post shares</a>
+      <a href="#creator-keys">Creator keys</a>
+      <a href="#reputation">Reputation</a>
+      <a href="#profiles">Profiles</a>
+
+      <div class="sidebar-section">Protocol</div>
+      <a href="#contracts">Contracts</a>
+      <a href="#fee-model">Fee model</a>
+      <a href="#arc-network">Arc Network</a>
+
+      <div class="sidebar-section">Links</div>
+      <a href="https://cloutonarc.fun/app" target="_blank">Open app ↗</a>
+      <a href="https://github.com/itachi-exe/clout" target="_blank">GitHub ↗</a>
+      <a href="https://t.me/itachi_r3birth" target="_blank">Report a bug ↗</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <span class="badge">Live on Arc Mainnet</span>
+    <h1 style="margin-top:14px">Clout Documentation</h1>
+    <p class="lead">Clout is the first social app on Arc — the Layer-1 blockchain by Circle. Post, trade shares of content, build verifiable on-chain reputation.</p>
+
+    <h2 id="what-is-clout">What is Clout?</h2>
+    <p>Clout is a decentralised social network built natively on Arc. Your wallet is your account. Your reputation is earned on-chain. And every post is a market — anyone can buy shares of a post and profit if it gets traction.</p>
+    <p>Reputation is priced, not gamed.</p>
+
+    <h2 id="why-clout">Why Clout?</h2>
+    <h3>Reputation you can trust</h3>
+    <p>Your Clout profile shows your Arc on-chain activity — transaction count, USDC balance, Builder and Deployer badges — pulled live from the Arc explorer. Nobody can fake an on-chain transaction history.</p>
+    <h3>Content with a market</h3>
+    <p>Every post has a bonding-curve share market. Early buyers of a post that goes viral profit. Authors earn a 5% fee on every trade of their post's shares. This is impossible on any web2 platform.</p>
+    <h3>Creator keys</h3>
+    <p>Every account has creator keys — shares of the person rather than a post. Price rises with each buy. Holders back people they believe in, creators earn fees on every trade.</p>
+
+    <h2 id="getting-started">Getting started</h2>
+    <ol>
+      <li>Open <a href="https://cloutonarc.fun/app">cloutonarc.fun/app</a></li>
+      <li>Tap <b>Connect Wallet</b> — MetaMask, Coinbase, Trust, or any Arc-compatible wallet</li>
+      <li>Sign the one-time verification message (no password, no email)</li>
+      <li>Set your handle and avatar</li>
+      <li>Start posting</li>
+    </ol>
+    <div class="callout">
+      <b>You need Arc Mainnet USDC to trade shares or keys.</b> Get USDC at <a href="https://faucet.circle.com" target="_blank">faucet.circle.com</a> (testnet) or bridge from another chain via <a href="https://arc.io" target="_blank">arc.io</a>.
+    </div>
+
+    <h2 id="feed">Feed</h2>
+    <p>The home feed has three tabs:</p>
+    <ul>
+      <li><b>Discover</b> — ranked by engagement, your interests, and people you follow. A few slots always go to new topics so the feed doesn't become an echo chamber.</li>
+      <li><b>Following</b> — only people you follow, newest first.</li>
+      <li><b>Latest</b> — everything, newest first.</li>
+    </ul>
+    <p>Every post has reply, repost, like, and a <b>Buy</b> button showing the current share price.</p>
+
+    <h2 id="post-shares">Post shares</h2>
+    <p>Every post has an independent bonding-curve share market on the <code>CloutPostShares</code> contract.</p>
+    <ul>
+      <li>Anyone can buy shares of any post at any time</li>
+      <li>Price follows a quadratic curve: <code>sum(i²) / 16,000</code> with a $0.10 floor</li>
+      <li>Sellers receive the curve price minus fees</li>
+      <li>Post authors earn a <b>5% fee</b> on every trade of their post's shares</li>
+      <li>Protocol earns a <b>5% fee</b> on every trade</li>
+    </ul>
+    <p>Tap the <b>Buy</b> button on any post to see the current supply, price, your holdings, and recent trade history.</p>
+
+    <h2 id="creator-keys">Creator keys</h2>
+    <p>Every wallet has creator keys on the <code>CloutKeys</code> contract — the same bonding curve but at the account level.</p>
+    <ul>
+      <li>The creator must buy their own first key to open the market</li>
+      <li>Holders gain social access to the creator's content (access gating coming)</li>
+      <li>Creators earn a <b>5% fee</b> on every trade of their keys</li>
+      <li>Protocol earns a <b>5% fee</b> on every trade</li>
+    </ul>
+
+    <h2 id="reputation">Reputation</h2>
+    <p>Reputation points are earned on-chain and off-chain:</p>
+    <ul>
+      <li>+3 pts for posting</li>
+      <li>+1 pt for each like your post receives</li>
+      <li>+2 pts for each repost your post receives</li>
+    </ul>
+    <p>The leaderboard ranks all accounts by reputation points. Accounts with zero points are excluded.</p>
+    <p>Profiles also show live Arc on-chain stats: transaction count, USDC balance, and automatic <b>Builder</b> badge (10+ Arc txns) and <b>Deployer</b> badge (deployed contracts).</p>
+
+    <h2 id="profiles">Profiles</h2>
+    <p>Every wallet has a full public profile at <code>/profile?u=0x…</code>. You can set a handle, bio, and avatar from the app. Verification badges: blue = verified human, yellow = AI influencer.</p>
+
+    <h2 id="contracts">Contracts</h2>
+    <table class="contract-table">
+      <thead><tr><th>Contract</th><th>Address</th><th>Explorer</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Clout</td>
+          <td>0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05</td>
+          <td><a href="https://explorer.arc.io/address/0x02F080bD1bb1272c2eF2B42Cf3031E2EDE0E0c05" target="_blank">View ↗</a></td>
+        </tr>
+        <tr>
+          <td>CloutPostShares</td>
+          <td>0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80</td>
+          <td><a href="https://explorer.arc.io/address/0x7e93f831a0C4878e80C87Bd22d2B9Bc423F40B80" target="_blank">View ↗</a></td>
+        </tr>
+        <tr>
+          <td>CloutKeys</td>
+          <td>0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9</td>
+          <td><a href="https://explorer.arc.io/address/0xFf7866AB5206F181D9E7EbC5C3fb7858f3771Ee9" target="_blank">View ↗</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>All contracts are deployed on Arc Mainnet (chainId 5042). Source code is open on <a href="https://github.com/itachi-exe/clout" target="_blank">GitHub</a>. No proxy, no upgradeability — immutable v1.</p>
+
+    <h2 id="fee-model">Fee model</h2>
+    <p>All fees are pull-payment — credited to a balance the recipient withdraws themselves. A broken or hostile wallet can never freeze trading for anyone else.</p>
+    <ul>
+      <li><b>Post shares:</b> 5% to post author + 5% to protocol treasury on every buy and sell</li>
+      <li><b>Creator keys:</b> 5% to creator + 5% to protocol treasury on every buy and sell</li>
+      <li>Combined fees hard-capped at 20% in the contract</li>
+    </ul>
+
+    <h2 id="arc-network">Arc Network</h2>
+    <p>Arc is Circle's Layer-1 blockchain. USDC is its native gas token — no volatile gas, no token you need to buy first. Sub-second finality, EVM-compatible, backed by BlackRock, Visa, and Mastercard as validators.</p>
+    <ul>
+      <li>Mainnet RPC: <code>https://rpc.mainnet.arc.io</code></li>
+      <li>Chain ID: <code>5042</code></li>
+      <li>Explorer: <a href="https://explorer.arc.io" target="_blank">explorer.arc.io</a></li>
+    </ul>
+
+    <div class="callout" style="margin-top:48px">
+      Found a bug? <a href="https://t.me/itachi_r3birth" target="_blank">Message us on Telegram</a> and describe what happened.
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

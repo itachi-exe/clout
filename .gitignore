@@ -15,9 +15,9 @@ deployer*.txt
 **/backups/
 node_modules/
 .vercel/
-yard-contracts/artifacts/
-yard-contracts/cache/
-yard-frontend/tests/shots/
+clout-contracts/artifacts/
+clout-contracts/cache/
+clout-frontend/tests/shots/
 __pycache__/
 *.pyc
 .DS_Store
