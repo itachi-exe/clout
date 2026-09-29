@@ -27,7 +27,7 @@ with sync_playwright() as p:
     """)
     pg.click("#btnLogin")
     pg.wait_for_timeout(2400)
-    print("login", pg.text_content("#btnLogin span"), "network", pg.text_content("#netLabel"))
+    print("login", pg.text_content("#btnLogin span"), "testnet notice", pg.text_content("#testnetNotice"))
 
     # Wallet shows direct provider balance
     pg.eval_on_selector_all(".nav-item", "els=>els[3].click()")
@@ -39,7 +39,7 @@ with sync_playwright() as p:
     pg.fill(".composer-input", POST)
     pg.click(".btn-post")
     pg.wait_for_timeout(1100)
-    print("post", pg.eval_on_selector("#posts article.post .post-body p", "el=>el.textContent"))
+    print("post", pg.eval_on_selector("#posts article.ay-post .ay-post-body p", "el=>el.textContent"))
 
     # Bob authenticates to real backend and likes Alice post, creating a notification
     result = pg.evaluate("""
@@ -63,7 +63,7 @@ with sync_playwright() as p:
 
     # Real server-side search UI
     pg.eval_on_selector_all(".nav-item", "els=>els[1].click()")
-    pg.fill(".search-box input", "liveproductqa")
+    pg.fill(".search-input", "liveproductqa")
     pg.wait_for_timeout(700)
     print("search", pg.text_content("#view-search .card"))
     print("errors", errors)

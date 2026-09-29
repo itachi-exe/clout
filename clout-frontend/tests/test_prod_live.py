@@ -39,13 +39,13 @@ with sync_playwright() as p:
     pg.fill(".composer-input", "live production post from itachi's headless QA")
     pg.click(".btn-post")
     pg.wait_for_timeout(1500)
-    print("toast:", pg.text_content("#toastMsg"))
-    print("feed first post:", pg.eval_on_selector("#posts article.post .post-body p", "el => el.textContent"))
+    print("toast:", pg.text_content(".ay-toast .ay-toast-msg"))
+    print("feed first post:", pg.eval_on_selector("#posts article.ay-post .ay-post-body p", "el => el.textContent"))
 
     # like it
-    pg.eval_on_selector_all("#posts article.post .act", "els => els[0].click()")
+    pg.eval_on_selector_all("#posts article.ay-post .ay-act", "els => els[0].click()")
     pg.wait_for_timeout(1000)
-    print("like count after self-block check (should be unchanged, own post):", pg.eval_on_selector("#posts article.post .act", "el => el.textContent.trim()"))
+    print("like count after self-block check (should be unchanged, own post):", pg.eval_on_selector("#posts article.ay-post .ay-act", "el => el.textContent.trim()"))
 
     print("errors:", errors)
     b.close()
