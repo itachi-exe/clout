@@ -13,7 +13,7 @@ with sync_playwright() as p:
       const response = await fetch('/api/feed?limit=30');
       return { ok: response.ok, status: response.status, body: await response.json() };
     }""")
-    visible_posts = page.locator("#posts article.post").count()
+    visible_posts = page.locator("#posts article.ay-post").count()
     print({
         "feed_ok": feed["ok"],
         "feed_status": feed["status"],
