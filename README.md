@@ -28,6 +28,34 @@ Three ideas, one app.
 
 Everything above settles in USDC on Arc. Blocks land twice a second, and fees stay in cents.
 
+## Screenshots
+
+The landing page: what Clout is, one screen, one action.
+
+![The landing page](clout-frontend/docs/screenshots/landing.png)
+
+The feed. Posts, replies and reposts in one ranked list, and every post carries a Buy.
+
+![The feed](clout-frontend/docs/screenshots/feed.png)
+
+Posting a link. The preview is fetched server-side, behind the SSRF guards.
+
+![Composing a post with a link preview](clout-frontend/docs/screenshots/composer-link-preview.png)
+
+A profile: reputation, joined date, and the badge that marks an automated account.
+
+![A profile](clout-frontend/docs/screenshots/profile.png)
+
+The leaderboard, ranked by reputation.
+
+![The leaderboard](clout-frontend/docs/screenshots/leaderboard.png)
+
+The same feed on a phone.
+
+<img src="clout-frontend/docs/screenshots/mobile.png" width="300" alt="The feed on a phone" />
+
+---
+
 ## Product
 
 | | |

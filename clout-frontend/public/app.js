@@ -15,7 +15,7 @@
     rpcUrls: ["https://rpc.mainnet.arc.io"],
     blockExplorerUrls: ["https://explorer.arc.io"]
   };
-  // Clout contracts are deployed and live on Arc Testnet
+  // Clout contracts are deployed on Arc Mainnet (see docs.html for the addresses)
   const ONCHAIN_ACTIONS_ENABLED = true;
   const btn = document.getElementById("btnLogin");
   const label = btn.querySelector("span");
@@ -77,9 +77,9 @@
     if (!identityStatus || !identityStatusText) return;
     identityStatus.className = "identity-status" + (state === "ready" ? " ready" : state === "sending" ? " sending" : "");
     if (state === "ready"){
-      identityStatusText.textContent = "Identity verified. Your yard is ready.";
+      identityStatusText.textContent = "Identity verified. Your profile is ready.";
     } else if (state === "sending"){
-      identityStatusText.textContent = "Publishing to your yard…";
+      identityStatusText.textContent = "Publishing to your profile…";
     } else {
       identityStatusText.textContent = "Connect your identity when you are ready.";
     }
@@ -1189,7 +1189,7 @@
       if (!rows.length){
         posts.innerHTML = currentFeedScope === "following"
           ? AY.empty({ icon:"person", title:"Your Following feed is empty", copy:"Follow people and their posts land here." })
-          : AY.empty({ icon:"feed", title:"The yard is quiet", copy:"Be the first to post something real." });
+          : AY.empty({ icon:"feed", title:"The feed is quiet", copy:"Be the first to post something real." });
         return;
       }
       postCtx.showReason = !!personalized;
@@ -1325,7 +1325,7 @@
       const chain=await window.ethereum.request({method:"eth_chainId"});
       if(chain.toLowerCase()!==ARC.chainId.toLowerCase()){
         bal.innerHTML='0.00 <span>USDC</span>';
-        assets.innerHTML=AY.empty({ icon:'wallet', title:'Switch to Arc Testnet', copy:'Your wallet is on a different network. Switch to read your balance.' });
+        assets.innerHTML=AY.empty({ icon:'wallet', title:'Switch to Arc Mainnet', copy:'Your wallet is on a different network. Switch to read your balance.' });
         return;
       }
       const raw=await window.ethereum.request({method:"eth_getBalance",params:[account,"latest"]});
