@@ -301,6 +301,15 @@
     return BigInt(result);
   }
 
+  const liveCache = {};
+  async function contractLive(addr){
+    if (addr in liveCache) return liveCache[addr];
+    try {
+      const code = await rpcCall("eth_getCode", [addr, "latest"]);
+      liveCache[addr] = typeof code === "string" && code.length > 2;
+    } catch(e){ liveCache[addr] = false; }
+    return liveCache[addr];
+  }
   async function getBuyPriceLive(creator){
     return ethCallUint(SEL_GET_BUY_PRICE_AFTER_FEE, creator, 1);
   }
@@ -423,6 +432,7 @@
   async function openTradeSheet(creator){
     if (!ONCHAIN_ACTIONS_ENABLED){ showToast("Key trading is paused until the audited contracts are live"); return; }
     if (!tradeSheet) return;
+    if (!(await contractLive(CLOUT_KEYS_CONTRACT))){ showToast("Creator keys are not live on this network yet", { kind:"info" }); return; }
     tradeState = { creator, side: "buy" };
     document.getElementById("tradeCreator").textContent = short(creator);
     document.getElementById("tradeKeyAmount").value = "1";
@@ -573,7 +583,7 @@
     } catch { return "—"; }
   }
 
-  async function openTradeSheet(p) {
+  async function openPostShareSheet(p) {
     if (!postTradeSheet) return;
     tradePost = p;
     document.getElementById("tradeSheetTitle").textContent = "Trade — post by @" + (p.handle || p.author.slice(0,6));
@@ -1071,7 +1081,7 @@
     t.addEventListener("click", () => {
       tradeTabs.forEach(x => x.classList.remove("on"));
       t.classList.add("on");
-      if (tradeBtn) tradeBtn.textContent = (t.dataset.side === "sell" ? "Sell YARD" : "Buy YARD");
+      if (tradeBtn) tradeBtn.textContent = (t.dataset.side === "sell" ? "Sell CLOUT" : "Buy CLOUT");
     });
   });
   if (tradeBtn){
@@ -1171,7 +1181,7 @@
     onAuthNeeded: () => { showToast("Connect your wallet to join in", { kind:"wallet" }); },
     toast: msg => showToast(msg),
     showReason: true,
-    onTrade: (p) => openTradeSheet(p),
+    onTrade: (p) => openPostShareSheet(p),
   };
   async function loadFeed(scope){
     if (!posts) return;
